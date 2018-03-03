@@ -26,7 +26,9 @@ type gapi = {
 [@bs.val] external environment : string = "process.env.NODE_ENV";
 
 [@bs.val] external gapi : gapi = "gapi";
-[@bs.scope ("JSON")] [@bs.val] external jsonStringify : (Js.t('a) => string) = "stringify";
+
+[@bs.scope "JSON"] [@bs.val]
+external jsonStringify : Js.t('a) => string = "stringify";
 
 let apiBaseUrl =
   switch environment {
@@ -39,22 +41,28 @@ let callbackUrl = {j|$apiBaseUrl/auth/google/callback|j};
 let login = () =>
   gapi##auth2##authorize(
     {
-      "client_id": "134550265313-0g4l0q55r2dvlf8gk7le56ekuhf77ekj",
+      "client_id": "1008243769527-gv6uq08kuatnu5gcdvd5bggtkpc5mc0k.apps.googleusercontent.com",
       "scope": "https://www.googleapis.com/auth/youtube.force-ssl",
       "response_type": "code"
     },
     response =>
     Js.Promise.(
-      Fetch.fetchWithInit(callbackUrl, Fetch.RequestInit.make(
-        ~method_=Post,
-        ~headers=Fetch.HeadersInit.make({
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        }),
-        ~body=Fetch.BodyInit.make(jsonStringify({ "code": response##code })),
-        ()
-      )) |> resolve
-    ) |> ignore
+      Fetch.fetchWithInit(
+        callbackUrl,
+        Fetch.RequestInit.make(
+          ~method_=Post,
+          ~headers=
+            Fetch.HeadersInit.make({
+              "Accept": "application/json",
+              "Content-Type": "application/json"
+            }),
+          ~body=Fetch.BodyInit.make(jsonStringify({"code": response##code})),
+          ()
+        )
+      )
+      |> resolve
+    )
+    |> ignore
   );
 
 let load = callback => gapi##load("auth2", callback);
