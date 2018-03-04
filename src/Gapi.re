@@ -42,7 +42,7 @@ let login = () =>
   gapi##auth2##authorize(
     {
       "client_id": "1008243769527-gv6uq08kuatnu5gcdvd5bggtkpc5mc0k.apps.googleusercontent.com",
-      "scope": "https://www.googleapis.com/auth/youtube.force-ssl",
+      "scope": "profile email https://www.googleapis.com/auth/youtube.force-ssl",
       "response_type": "code"
     },
     response =>
@@ -54,7 +54,8 @@ let login = () =>
           ~headers=
             Fetch.HeadersInit.make({
               "Accept": "application/json",
-              "Content-Type": "application/json"
+              "Content-Type": "application/json",
+              "X-Requested-With": "XMLHttpRequest"
             }),
           ~body=Fetch.BodyInit.make(jsonStringify({"code": response##code})),
           ()
