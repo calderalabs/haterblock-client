@@ -1273,6 +1273,10 @@ bs-jest@^0.3.2:
   dependencies:
     jest "^22.0.4"
 
+bs-json@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/bs-json/-/bs-json-1.0.1.tgz#0e25ed5ba7164ab131e494669b755da9844cc37e"
+
 bs-loader@^1.8.0:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/bs-loader/-/bs-loader-1.8.2.tgz#efd19d56b14d8e0c8bb18283045e7f04427d6cab"

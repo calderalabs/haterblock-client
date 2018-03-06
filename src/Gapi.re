@@ -38,6 +38,13 @@ let apiBaseUrl =
 
 let callbackUrl = {j|$apiBaseUrl/auth/google/callback|j};
 
+type callback = {token: string};
+
+module Decode = {
+  let callback = json : callback =>
+    Json.Decode.{token: json |> field("token", string)};
+};
+
 let login = () =>
   gapi##auth2##authorize(
     {
@@ -61,7 +68,21 @@ let login = () =>
           ()
         )
       )
-      |> resolve
+      |> then_(Fetch.Response.json)
+      |> then_(json =>
+           json
+           |> Decode.callback
+           |> (
+             callback => {
+               Dom.Storage.setItem(
+                 "token",
+                 callback.token,
+                 Dom.Storage.localStorage
+               );
+               resolve();
+             }
+           )
+         )
     )
     |> ignore
   );
