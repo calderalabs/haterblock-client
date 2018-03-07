@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:9.3.0
+      - image: circleci/node:9.7.1
 
     working_directory: ~/haterblock-client
 
