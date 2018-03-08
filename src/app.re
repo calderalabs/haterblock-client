@@ -4,19 +4,19 @@
 
 type state = {loading: bool};
 
-type action = Loaded;
+type action =
+  | Loaded;
 
 let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
-  let login = _event => Gapi.login();
+  let login = _event => Session.login();
   {
     ...component,
     initialState: () => {loading: true},
     didMount: ({ReasonReact.reduce}) => {
-      Gapi.load(() =>
-        reduce(() => Loaded, ())
-      );
+      Api.request(~method=Fetch.Get, ~path="/users/me", ~callback=(json) => json |> Js.log, ());
+      Session.load(() => reduce(() => Loaded, ()));
       ReasonReact.NoUpdate;
     },
     reducer: (action, _state) =>
