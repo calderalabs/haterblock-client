@@ -14,7 +14,6 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "prepare": "npm link bs-platform",
     "deploy": "npm run build && stout deploy --bucket $(terraform output bucket_name) --key $AWS_ACCESS_KEY_ID --secret $AWS_SECRET_ACCESS_KEY --root ./build --region $(terraform output bucket_region) && yarn invalidate-cache",
     "invalidate-cache": "aws cloudfront create-invalidation --distribution-id $(terraform output cdn_id) --paths /index.html"
   },
