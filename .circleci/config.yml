@@ -9,6 +9,9 @@ jobs:
       # specify the version you desire here
       - image: circleci/node:9.7.1
 
+    environment:
+      - NPM_CONFIG_PREFIX: ~/.npm-global
+
     working_directory: ~/haterblock-client
 
     steps:
@@ -21,12 +24,12 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: yarn global add bs-platform
       - run: yarn install
 
       - save_cache:
           paths:
             - node_modules
+            - ~/.npm-global
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # run tests!
