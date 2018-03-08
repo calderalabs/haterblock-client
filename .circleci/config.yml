@@ -9,6 +9,9 @@ jobs:
       # specify the version you desire here
       - image: circleci/node:9.7.1
 
+    environment:
+      - NPM_CONFIG_PREFIX: ~/.npm-global
+
     working_directory: ~/haterblock-client
 
     steps:
@@ -26,6 +29,7 @@ jobs:
       - save_cache:
           paths:
             - node_modules
+            - ~/.npm-global
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # run tests!
