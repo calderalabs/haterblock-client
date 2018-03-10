@@ -1,6 +1,4 @@
-type t = {id: string};
+type t = {id: int};
 
-let decode = json : t => {
-  let jsonApi = JsonApi.decode(json);
-  Json.Decode.{id: Js.Json.object_(jsonApi.data) |> field("id", string)};
-};
+let decode = (json: Js.Json.t) : t =>
+  json |> JsonApi.decode(json => Json.Decode.{id: json |> field("id", int)});

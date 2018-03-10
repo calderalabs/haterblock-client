@@ -13,26 +13,25 @@ type action =
 let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
+  let fetchCurrentUser = send =>
+    Api.request(
+      ~method=Fetch.Get,
+      ~path="/users/me",
+      ~callback=json => send(Login(json |> User.decode)),
+      ()
+    );
   let login = (_event, {ReasonReact.send}) => {
     send(Loading);
-    Session.login(() => send(Loaded));
+    Session.login(() => fetchCurrentUser(send));
   };
   {
     ...component,
     initialState: () => {loading: true, currentUser: None},
-    didMount: ({ReasonReact.send}) =>
-      ReasonReact.SideEffects(
-        _self => {
-          Api.request(
-            ~method=Fetch.Get,
-            ~path="/users/me",
-            ~callback=
-              json => json |> User.decode |> ignore,
-            ()
-          );
-          Gapi.load(~libs="auth2:client", ~callback=() => send(Loaded));
-        }
-      ),
+    didMount: ({ReasonReact.send}) => {
+      fetchCurrentUser(send);
+      Gapi.load(~libs="auth2:client", ~callback=() => send(Loaded));
+      ReasonReact.NoUpdate;
+    },
     reducer: (action, state) =>
       switch action {
       | Loading => ReasonReact.Update({...state, loading: true})
@@ -49,7 +48,8 @@ let make = _children => {
             <button onClick=(handle(login))>
               (ReasonReact.stringToElement("Login"))
             </button>
-          | (false, Some(user)) => ReasonReact.stringToElement(user.id)
+          | (false, Some(user)) =>
+            ReasonReact.stringToElement(string_of_int(user.id))
           }
         )
       </div>

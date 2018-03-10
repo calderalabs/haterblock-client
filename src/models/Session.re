@@ -1,6 +1,7 @@
 type t = {token: string};
 
-let decode = json : t => Json.Decode.{token: json |> field("token", string)};
+let decode = (json: Js.Json.t) : t =>
+  Json.Decode.{token: json |> field("token", string)};
 
 let login = (callback: unit => unit) =>
   Gapi.authorize(
