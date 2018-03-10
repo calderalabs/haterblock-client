@@ -1,6 +1,4 @@
-[%bs.raw {|require('./app.css')|}];
-
-[@bs.module] external logo : string = "./logo.svg";
+[%bs.raw {|require('./App.css')|}];
 
 type state = {loading: bool};
 
