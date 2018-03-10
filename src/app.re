@@ -14,11 +14,18 @@ let make = _children => {
   {
     ...component,
     initialState: () => {loading: true},
-    didMount: ({ReasonReact.reduce}) => {
-      Api.request(~method=Fetch.Get, ~path="/users/me", ~callback=(json) => json |> Js.log, ());
-      Session.load(() => reduce(() => Loaded, ()));
-      ReasonReact.NoUpdate;
-    },
+    didMount: ({ReasonReact.reduce}) =>
+      ReasonReact.SideEffects(
+        _self => {
+          Api.request(
+            ~method=Fetch.Get,
+            ~path="/users/me",
+            ~callback=json => json |> Js.log,
+            ()
+          );
+          Session.load(() => reduce(() => Loaded, ()));
+        }
+      ),
     reducer: (action, _state) =>
       switch action {
       | Loaded => ReasonReact.Update({loading: false})
