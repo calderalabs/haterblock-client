@@ -21,10 +21,18 @@ let make = _children => {
       ~callback=json => callback(json |> User.decode),
       ()
     );
+
+  let login = ({ReasonReact.send}) => {
+    send(Loading);
+    Session.login(() => fetchCurrentUser(user =>
+      send(UserLoaded(user))
+    ));
+  };
+
   {
     ...component,
     initialState: () => {loading: true, currentUser: None},
-    didMount: ({ReasonReact.send}) => {
+    didMount: ({send}) => {
       fetchCurrentUser(user => send(UserLoaded(user)));
       Gapi.load(~libs="auth2:client", ~callback=() => send(Loaded));
       ReasonReact.NoUpdate;
@@ -33,13 +41,7 @@ let make = _children => {
       switch action {
       | Loading => ReasonReact.Update({...state, loading: true})
       | Loaded => ReasonReact.Update({...state, loading: false})
-      | Login =>
-        ReasonReact.UpdateWithSideEffects(
-          {...state, loading: true},
-          ({send}) => Session.login(() => fetchCurrentUser(user =>
-            send(UserLoaded(user))
-          ))
-        )
+      | Login => ReasonReact.SideEffects(self => login(self))
       | UserLoaded(user) => ReasonReact.Update({loading: false, currentUser: Some(user)})
       },
     render: ({state, send}) =>
