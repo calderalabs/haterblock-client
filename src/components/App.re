@@ -18,7 +18,7 @@ let make = _children => {
     Api.request(
       ~method=Fetch.Get,
       ~path="/users/me",
-      ~callback=json => callback(json |> User.decode),
+      ~callback=json => callback(json |> JsonApi.decodeOne(User.decode)),
       ()
     );
   let login = ({ReasonReact.send}) => {
