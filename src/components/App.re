@@ -23,10 +23,12 @@ let make = _children => {
     );
   let login = ({ReasonReact.send}) => {
     send(Loading("Logging in..."));
-    Session.login(() => fetchCurrentUser(user => {
-      send(UserLoaded(user));
-      send(Loaded);
-    }));
+    Session.login(() =>
+      fetchCurrentUser(user => {
+        send(UserLoaded(user));
+        send(Loaded);
+      })
+    );
   };
   {
     ...component,
@@ -41,7 +43,8 @@ let make = _children => {
     },
     reducer: (action, state) =>
       switch action {
-      | Loading(message) => ReasonReact.Update({...state, loadingMessage: Some(message)})
+      | Loading(message) =>
+        ReasonReact.Update({...state, loadingMessage: Some(message)})
       | Loaded => ReasonReact.Update({...state, loadingMessage: None})
       | Login => ReasonReact.SideEffects((self => login(self)))
       | UserLoaded(user) =>
@@ -57,8 +60,7 @@ let make = _children => {
             <button onClick=(_event => send(Login))>
               (ReasonReact.stringToElement("Login"))
             </button>
-          | (None, Some(user)) =>
-            ReasonReact.stringToElement(string_of_int(user.id))
+          | (None, Some(user)) => <Dashboard user />
           }
         )
       </div>
