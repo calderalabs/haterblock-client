@@ -1,14 +1,14 @@
 [%bs.raw {|require('./App.css')|}];
 
 type state = {
-  loading: bool,
+  loadingMessage: option(string),
   currentUser: option(User.t)
 };
 
 type action =
   | Login
   | UserLoaded(User.t)
-  | Loading
+  | Loading(string)
   | Loaded;
 
 let component = ReasonReact.reducerComponent("App");
@@ -21,39 +21,43 @@ let make = _children => {
       ~callback=json => callback(json |> User.decode),
       ()
     );
-
   let login = ({ReasonReact.send}) => {
-    send(Loading);
-    Session.login(() => fetchCurrentUser(user =>
-      send(UserLoaded(user))
-    ));
+    send(Loading("Logging in..."));
+    Session.login(() => fetchCurrentUser(user => {
+      send(UserLoaded(user));
+      send(Loaded);
+    }));
   };
-
   {
     ...component,
-    initialState: () => {loading: true, currentUser: None},
+    initialState: () => {loadingMessage: Some("Loading..."), currentUser: None},
     didMount: ({send}) => {
-      fetchCurrentUser(user => send(UserLoaded(user)));
+      fetchCurrentUser(user => {
+        send(UserLoaded(user));
+        send(Loaded);
+      });
       Gapi.load(~libs="auth2:client", ~callback=() => send(Loaded));
       ReasonReact.NoUpdate;
     },
     reducer: (action, state) =>
       switch action {
-      | Loading => ReasonReact.Update({...state, loading: true})
-      | Loaded => ReasonReact.Update({...state, loading: false})
-      | Login => ReasonReact.SideEffects(self => login(self))
-      | UserLoaded(user) => ReasonReact.Update({loading: false, currentUser: Some(user)})
+      | Loading(message) => ReasonReact.Update({...state, loadingMessage: Some(message)})
+      | Loaded => ReasonReact.Update({...state, loadingMessage: None})
+      | Login => ReasonReact.SideEffects((self => login(self)))
+      | UserLoaded(user) =>
+        ReasonReact.Update({...state, currentUser: Some(user)})
       },
     render: ({state, send}) =>
       <div className="App">
         (
-          switch (state.loading, state.currentUser) {
-          | (true, _) => ReasonReact.nullElement
-          | (false, None) =>
-            <button onClick=((_event) => send(Login))>
+          switch (state.loadingMessage, state.currentUser) {
+          | (Some(loadingMessage), _) =>
+            <span> (ReasonReact.stringToElement(loadingMessage)) </span>
+          | (None, None) =>
+            <button onClick=(_event => send(Login))>
               (ReasonReact.stringToElement("Login"))
             </button>
-          | (false, Some(user)) =>
+          | (None, Some(user)) =>
             ReasonReact.stringToElement(string_of_int(user.id))
           }
         )
