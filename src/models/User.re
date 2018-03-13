@@ -1,4 +1,19 @@
 type t = {id: int};
 
-let decode = (json: Js.Json.t) : t =>
-  Json.Decode.{id: json |> field("id", int)};
+type attributes = {.};
+
+let decode = (_json: Js.Json.t) => {};
+
+let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) => {
+  id: resource.id
+};
+
+let fetch = (callback: t => unit) =>
+  Api.request(
+    ~method=Fetch.Get,
+    ~path="/users/me",
+    ~callback=
+      json =>
+        callback(json |> JsonApi.Document.decodeOne(decode, resourceToRecord)),
+    ()
+  );
