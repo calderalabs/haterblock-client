@@ -8,10 +8,11 @@ type attributes = {body: string};
 let decode = (json: Js.Json.t) =>
   Json.Decode.{body: json |> field("body", string)};
 
-let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) => {
-  id: resource.id,
-  body: resource.attributes.body
-};
+let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) =>
+  switch resource.attributes {
+  | None => {id: resource.id, body: ""}
+  | Some(attributes) => {id: resource.id, body: attributes.body}
+  };
 
 let fetchAll = (callback: array(t) => unit) =>
   Api.request(
