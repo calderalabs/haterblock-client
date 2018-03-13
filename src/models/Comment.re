@@ -5,7 +5,7 @@ type t = {
 
 type attributes = {body: string};
 
-let decode = (json: Js.Json.t) =>
+let attributesDecoder = (json: Js.Json.t) =>
   Json.Decode.{body: json |> field("body", string)};
 
 let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) =>
@@ -21,7 +21,8 @@ let fetchAll = (callback: array(t) => unit) =>
     ~callback=
       json =>
         callback(
-          json |> JsonApi.Document.decodeMany(decode, resourceToRecord)
+          json
+          |> JsonApi.Document.decodeMany(attributesDecoder, resourceToRecord)
         ),
     ()
   );

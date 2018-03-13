@@ -1,11 +1,8 @@
 type t = {id: int};
 
-type attributes =
-  | None;
+let attributesDecoder = (_json: Js.Json.t) => None;
 
-let decode = (_json: Js.Json.t) => None;
-
-let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) => {
+let resourceToRecord = (resource: JsonApi.Resource.t('a)) => {
   id: resource.id
 };
 
@@ -15,6 +12,6 @@ let fetch = (callback: t => unit) =>
     ~path="/users/me",
     ~callback=
       json =>
-        callback(json |> JsonApi.Document.decodeOne(decode, resourceToRecord)),
+        callback(json |> JsonApi.Document.decodeOne(attributesDecoder, resourceToRecord)),
     ()
   );
