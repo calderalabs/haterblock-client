@@ -1,6 +1,6 @@
 type t = {id: int};
 
-let attributesDecoder = (_json: Js.Json.t) => None;
+let attributesDecoder = (_json: Js.Json.t) => ();
 
 let resourceToRecord = (resource: JsonApi.Resource.t('a)) => {
   id: resource.id
