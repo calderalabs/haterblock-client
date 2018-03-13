@@ -1,10 +1,45 @@
-let decodeDocument = (decoder: Json.Decode.decoder('a), json: Js.Json.t) =>
-  Json.Decode.(json |> field("data", decoder));
+open Json.Decode;
 
-let decodeOne = (decoder: Json.Decode.decoder('a), json: Js.Json.t) : 'a =>
-  json |> decodeDocument(json => decoder(json));
+module Resource = {
+  type t('a) = {
+    id: int,
+    attributes: option('a)
+  };
+  let decode =
+      (~attributesDecoder: option(Json.Decode.decoder('a))=?, json: Js.Json.t) => {
+    id: json |> field("id", int),
+    attributes:
+      switch attributesDecoder {
+      | None => None
+      | Some(attributesDecoder) =>
+        json |> optional(field("attributes", attributesDecoder))
+      }
+  };
+};
 
-let decodeArray =
-    (decoder: Json.Decode.decoder('a), json: Js.Json.t)
-    : array('a) =>
-  json |> decodeDocument(json => Json.Decode.(json |> array(decoder)));
+module Document = {
+  type one('a) = {data: Resource.t('a)};
+  type many('a) = {data: array(Resource.t('a))};
+  let decodeOne =
+      (
+        ~attributesDecoder: option(Json.Decode.decoder('a))=?,
+        resourceToRecord: Resource.t('a) => 'b,
+        json: Js.Json.t
+      ) => {
+    let document: one('a) = {
+      data: json |> field("data", Resource.decode(~attributesDecoder?))
+    };
+    resourceToRecord(document.data);
+  };
+  let decodeMany =
+      (
+        ~attributesDecoder: option(Json.Decode.decoder('a))=?,
+        resourceToRecord: Resource.t('a) => 'b,
+        json: Js.Json.t
+      ) => {
+    let document: many('a) = {
+      data: json |> field("data", array(Resource.decode(~attributesDecoder?)))
+    };
+    document.data |> Array.map(resourceToRecord);
+  };
+};

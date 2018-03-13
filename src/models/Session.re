@@ -1,6 +1,6 @@
 type t = {token: string};
 
-let decode = (json: Js.Json.t) : t =>
+let decode = (json: Js.Json.t) =>
   Json.Decode.{token: json |> field("token", string)};
 
 let login = (callback: unit => unit) =>

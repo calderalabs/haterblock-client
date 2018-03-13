@@ -14,13 +14,7 @@ type action =
 let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
-  let fetchCurrentUser = callback =>
-    Api.request(
-      ~method=Fetch.Get,
-      ~path="/users/me",
-      ~callback=json => callback(json |> JsonApi.decodeOne(User.decode)),
-      ()
-    );
+  let fetchCurrentUser = callback => User.fetch(callback);
   let login = ({ReasonReact.send}) => {
     send(Loading("Logging in..."));
     Session.login(() =>
