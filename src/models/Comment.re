@@ -22,7 +22,7 @@ let fetchAll = (callback: array(t) => unit) =>
       json =>
         callback(
           json
-          |> JsonApi.Document.decodeMany(attributesDecoder, resourceToRecord)
+          |> JsonApi.Document.decodeMany(~attributesDecoder, resourceToRecord)
         ),
     ()
   );
