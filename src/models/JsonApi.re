@@ -10,42 +10,44 @@ module Resource = {
 module Document = {
   type one('a) = {data: Resource.t('a)};
   type many('a) = {data: array(Resource.t('a))};
+  let decodeOne =
+      (resourceDecoder: Js.Json.t => Resource.t('a), json: Js.Json.t)
+      : one('a) => {
+    data: json |> field("data", resourceDecoder)
+  };
+  let decodeMany =
+      (resourceDecoder: Js.Json.t => Resource.t('a), json: Js.Json.t)
+      : many('a) => {
+    data: json |> field("data", array(resourceDecoder))
+  };
 };
 
-module type AttributesDecoder = {
+module type Decodable = {
   type model;
   type attributes;
-  let decoder: Js.Json.t => attributes;
+  let attributesDecoder: Js.Json.t => attributes;
   let resourceToRecord: Resource.t(attributes) => model;
 };
 
 module type Decoder = {
-  type model;
-  let decodeOne: Js.Json.t => model;
-  let decodeMany: Js.Json.t => array(model);
+  type t;
+  let decodeOne: Js.Json.t => t;
+  let decodeMany: Js.Json.t => array(t);
 };
 
 module MakeDecoder =
-       (AttributesDecoder: AttributesDecoder)
-       : (Decoder with type model := AttributesDecoder.model) => {
-  type model = AttributesDecoder.model;
-  type attributes = AttributesDecoder.attributes;
-  let decoder = AttributesDecoder.decoder;
-  let resourceToRecord = AttributesDecoder.resourceToRecord;
-  let resourceDecoder = (json: Js.Json.t) : Resource.t(attributes) => {
+       (Decodable: Decodable)
+       : (Decoder with type t := Decodable.model) => {
+  type t = Decodable.model;
+  let resourceDecoder = (json: Js.Json.t) : Resource.t(Decodable.attributes) => {
     id: json |> field("id", int),
-    attributes: json |> optional(field("attributes", decoder))
+    attributes:
+      json |> optional(field("attributes", Decodable.attributesDecoder))
   };
-  let decodeOne = (json: Js.Json.t) : model => {
-    let document: Document.one(attributes) = {
-      data: json |> field("data", resourceDecoder)
-    };
-    resourceToRecord(document.data);
-  };
-  let decodeMany = (json: Js.Json.t) : array(model) => {
-    let document: Document.many(attributes) = {
-      data: json |> field("data", array(resourceDecoder))
-    };
-    document.data |> Array.map(resourceToRecord);
-  };
+  let decodeOne = (json: Js.Json.t) : t =>
+    Document.decodeOne(resourceDecoder, json).data
+    |> Decodable.resourceToRecord;
+  let decodeMany = (json: Js.Json.t) : array(t) =>
+    Document.decodeMany(resourceDecoder, json).data
+    |> Array.map(Decodable.resourceToRecord);
 };

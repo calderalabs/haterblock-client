@@ -8,7 +8,7 @@ module CommentDecoder =
     {
       type model = t;
       type attributes = {body: string};
-      let decoder = (json: Js.Json.t) : attributes =>
+      let attributesDecoder = (json: Js.Json.t) : attributes =>
         Json.Decode.{body: json |> field("body", string)};
       let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : model =>
         switch resource.attributes {
