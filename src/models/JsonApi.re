@@ -15,7 +15,7 @@ module Document = {
 module type AttributesDecoder = {
   type model;
   type attributes;
-  let attributesDecoder: Js.Json.t => attributes;
+  let decoder: Js.Json.t => attributes;
   let resourceToRecord: Resource.t(attributes) => model;
 };
 
@@ -26,15 +26,15 @@ module type Decoder = {
 };
 
 module MakeDecoder =
-       (Decoder: AttributesDecoder)
-       : (Decoder with type model := Decoder.model) => {
-  type model = Decoder.model;
-  type attributes = Decoder.attributes;
-  let attributesDecoder = Decoder.attributesDecoder;
-  let resourceToRecord = Decoder.resourceToRecord;
+       (AttributesDecoder: AttributesDecoder)
+       : (Decoder with type model := AttributesDecoder.model) => {
+  type model = AttributesDecoder.model;
+  type attributes = AttributesDecoder.attributes;
+  let decoder = AttributesDecoder.decoder;
+  let resourceToRecord = AttributesDecoder.resourceToRecord;
   let resourceDecoder = (json: Js.Json.t) : Resource.t(attributes) => {
     id: json |> field("id", int),
-    attributes: json |> optional(field("attributes", attributesDecoder))
+    attributes: json |> optional(field("attributes", decoder))
   };
   let decodeOne = (json: Js.Json.t) : model => {
     let document: Document.one(attributes) = {

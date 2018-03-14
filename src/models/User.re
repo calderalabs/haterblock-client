@@ -5,7 +5,7 @@ module UserDecoder =
     {
       type model = t;
       type attributes = {.};
-      let attributesDecoder = (json: Js.Json.t) : attributes => {};
+      let decoder = (json: Js.Json.t) : attributes => {};
       let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : model => {
         id: resource.id
       };
