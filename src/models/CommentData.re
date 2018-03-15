@@ -1,7 +1,15 @@
 type t = {
   id: int,
-  body: string
+  body: string,
+  score: int,
+  videoId: int
 };
+
+type sentiment =
+  | Hateful
+  | Negative
+  | Neutral
+  | Positive;
 
 module CommentDecoder =
   JsonApi.MakeDecoder(
@@ -12,8 +20,13 @@ module CommentDecoder =
         Json.Decode.{body: json |> field("body", string)};
       let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : model =>
         switch resource.attributes {
-        | None => {id: resource.id, body: ""}
-        | Some(attributes) => {id: resource.id, body: attributes.body}
+        | None => {id: resource.id, body: "", score: 0, videoId: 0}
+        | Some(attributes) => {
+            id: resource.id,
+            body: attributes.body,
+            score: 0,
+            videoId: 0
+          }
         };
     }
   );

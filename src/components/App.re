@@ -2,26 +2,30 @@
 
 type state = {
   loadingMessage: option(string),
-  currentUser: option(User.t)
+  currentUser: option(UserData.t)
 };
 
 type action =
   | Login
-  | UserLoaded(User.t)
+  | UserLoaded(UserData.t)
   | Loading(string)
   | Loaded;
 
 let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
-  let fetchCurrentUser = callback => User.fetch(callback);
+  let fetchCurrentUser = callback => UserData.fetch(callback);
   let login = ({ReasonReact.send}) => {
     send(Loading("Logging in..."));
-    Session.login(() =>
-      fetchCurrentUser(user => {
-        send(UserLoaded(user));
-        send(Loaded);
-      })
+    Session.login(response =>
+      switch response {
+      | Success =>
+        fetchCurrentUser(user => {
+          send(UserLoaded(user));
+          send(Loaded);
+        })
+      | Error => send(Loaded)
+      }
     );
   };
   {

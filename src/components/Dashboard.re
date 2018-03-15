@@ -1,15 +1,60 @@
 [%bs.raw {|require('./Dashboard.css')|}];
 
-type state = {comments: option(array(Comment.t))};
+type state = {comments: option(array(CommentData.t))};
 
 type actions =
-  | CommentsLoaded(array(Comment.t));
+  | CommentsLoaded(array(CommentData.t));
 
 let component = ReasonReact.reducerComponent("Dasboard");
 
-let make = (~user: User.t, _children) => {
+let comments : array(CommentData.t) = [|{
+  id: 1,
+  body: "I don't like this",
+  score: -6,
+  videoId: 0
+}, {
+  id: 2,
+  body: "This is terrible",
+  score: -4,
+  videoId: 0
+}, {
+  id: 3,
+  body: "Awful content mate",
+  score: -5,
+  videoId: 0
+}, {
+  id: 4,
+  body: "This is fucking shit",
+  score: -8,
+  videoId: 0
+}, {
+  id: 5,
+  body: "You should kill yourself",
+  score: -7,
+  videoId: 0
+}, {
+  id: 6,
+  body: "This is total garbage",
+  score: -9,
+  videoId: 0
+}|];
+
+let renderCommentList = (comments: array(CommentData.t)) =>
+  comments
+  |> Array.map(comment =>
+    CommentData.(<div key=string_of_int(comment.id)> <Comment comment/> </div>)
+  )
+  |> ReasonReact.arrayToElement;
+
+let filterBetweenScore = (maxScore, minScore, comments) =>
+  comments
+  |> Array.to_list
+  |> List.filter(comment => CommentData.(comment.score >= minScore && comment.score <= maxScore))
+  |> Array.of_list;
+
+let make = (~user: UserData.t, _children) => {
   let loadComments = ({ReasonReact.send}) =>
-    Comment.fetchAll(comments => send(CommentsLoaded(comments)));
+    send(CommentsLoaded(comments));
   {
     ...component,
     initialState: () => {comments: None},
@@ -33,10 +78,14 @@ let make = (~user: User.t, _children) => {
             <div>
               (
                 comments
-                |> Array.map((comment: Comment.t) =>
-                     <div> (ReasonReact.stringToElement(comment.body)) </div>
-                   )
-                |> ReasonReact.arrayToElement
+                |> filterBetweenScore(0, -5)
+                |> renderCommentList
+              )
+
+              (
+                comments
+                |> filterBetweenScore(-6, -10)
+                |> renderCommentList
               )
             </div>
           }
