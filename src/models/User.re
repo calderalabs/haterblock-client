@@ -4,8 +4,8 @@ module UserDecoder =
   JsonApi.MakeDecoder(
     {
       type model = t;
-      type attributes = {.};
-      let attributesDecoder = (_json: Js.Json.t) : attributes => {};
+      type attributes = option({.});
+      let attributesDecoder = (_json: Js.Json.t) : attributes => None;
       let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : model => {
         id: resource.id
       };
