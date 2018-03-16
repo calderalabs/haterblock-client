@@ -2,25 +2,23 @@
 
 let component = ReasonReact.statelessComponent("Comment");
 
-let sentimentToString = (sentiment: CommentData.sentiment) =>
+let sentimentToClass = (sentiment: CommentData.sentiment) =>
   switch sentiment {
-  | Hateful => "Hateful"
-  | Negative => "Negative"
-  | Neutral => "Neutral"
-  | Positive => "Positive"
+  | Hateful => "hateful"
+  | Negative => "negative"
+  | Neutral => "neutral"
+  | Positive => "positive"
   };
 
 let make = (~comment: CommentData.t, _children) => {
-  ...component,
-  render: _self =>
-    <div className="Comment">
-      <div className="body">
-        CommentData.(ReasonReact.stringToElement(comment.body))
+  let sentiment = sentimentToClass(CommentData.sentiment(comment));
+  {
+    ...component,
+    render: _self =>
+      <div className={j|Comment Comment--$sentiment|j}>
+        <div className="body">
+          CommentData.(ReasonReact.stringToElement(comment.body))
+        </div>
       </div>
-      <div className="sentiment">
-        CommentData.(
-          ReasonReact.stringToElement(sentimentToString(sentiment(comment)))
-        )
-      </div>
-    </div>
+  };
 };
