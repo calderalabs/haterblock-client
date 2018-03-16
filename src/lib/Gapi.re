@@ -1,7 +1,7 @@
 type response = {
   .
   "code": string,
-  "error": Js.nullable(string)
+  [@bs.return nullable] "error": option(string)
 };
 
 type gapi = {
