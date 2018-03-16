@@ -29,16 +29,16 @@ module Sentiment = {
     | 2
     | 1
     | 0
-    | (-1)
-    | (-2)
-    | (-3) => Neutral
-    | (-4)
-    | (-5)
-    | (-6) => Negative
-    | (-7)
-    | (-8)
-    | (-9)
-    | (-10) => Hateful
+    | -1
+    | -2
+    | -3 => Neutral
+    | -4
+    | -5
+    | -6 => Negative
+    | -7
+    | -8
+    | -9
+    | -10 => Hateful
     | _ => raise(InvalidSentiment)
     };
 

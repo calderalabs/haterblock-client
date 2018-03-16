@@ -2,14 +2,14 @@
   color: green;
 }
 
-.Comment--hateful {
-  color: orange;
-}
-
 .Comment--neutral {
   color: black;
 }
 
 .Comment--negative {
+  color: orange;
+}
+
+.Comment--hateful {
   color: red;
 }
