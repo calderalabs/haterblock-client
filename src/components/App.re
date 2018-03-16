@@ -14,17 +14,21 @@ type action =
 let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
-  let fetchCurrentUser = (send) =>
-    UserData.fetch((user => {
-      send(UserLoaded(user));
-      send(Loaded);
-    }) |> Callback.ignoreError);
-
+  let fetchCurrentUser = send =>
+    UserData.fetch(
+      (
+        user => {
+          send(UserLoaded(user));
+          send(Loaded);
+        }
+      )
+      |> Callback.ignoreError
+    );
   let login = ({ReasonReact.send}) => {
     send(Loading("Logging in..."));
     Session.login(response =>
       switch response {
-      | Success() => fetchCurrentUser(send)
+      | Success () => fetchCurrentUser(send)
       | Error(_error) => send(Loaded)
       }
     );

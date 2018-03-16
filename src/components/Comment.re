@@ -7,7 +7,7 @@ type actions =
 
 let component = ReasonReact.reducerComponent("Comment");
 
-let sentimentToClass = (sentiment: CommentData.Sentiment.t) =>
+let sentimentToEmoji = (sentiment: CommentData.Sentiment.t) =>
   switch sentiment {
   | Hateful => {js|😡|js}
   | Negative => {js|😠|js}
@@ -16,10 +16,9 @@ let sentimentToClass = (sentiment: CommentData.Sentiment.t) =>
   };
 
 let make = (~comment: CommentData.Comment.t, _children) => {
-  let sentiment = sentimentToClass(CommentData.Sentiment.sentiment(comment));
-  let reject = (_event, {ReasonReact.send}) => {
-    comment |> CommentData.reject((() => send(Reject)) |> Callback.ignoreError)
-  };
+  let sentiment = sentimentToEmoji(CommentData.Sentiment.sentiment(comment));
+  let reject = (_event, {ReasonReact.send}) =>
+    comment |> CommentData.reject((() => send(Reject)) |> Callback.ignoreError);
   {
     ...component,
     initialState: () => {rejected: false},
