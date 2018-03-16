@@ -2,36 +2,38 @@
 
 type state = {
   loadingMessage: option(string),
-  currentUser: option(User.t)
+  currentUser: option(UserData.User.t)
 };
 
 type action =
   | Login
-  | UserLoaded(User.t)
+  | UserLoaded(UserData.User.t)
   | Loading(string)
   | Loaded;
 
 let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
-  let fetchCurrentUser = callback => User.fetch(callback);
+  let fetchCurrentUser = (send) =>
+    UserData.fetch((user => {
+      send(UserLoaded(user));
+      send(Loaded);
+    }) |> Callback.ignoreError);
+
   let login = ({ReasonReact.send}) => {
     send(Loading("Logging in..."));
-    Session.login(() =>
-      fetchCurrentUser(user => {
-        send(UserLoaded(user));
-        send(Loaded);
-      })
+    Session.login(response =>
+      switch response {
+      | Success() => fetchCurrentUser(send)
+      | Error(_error) => send(Loaded)
+      }
     );
   };
   {
     ...component,
     initialState: () => {loadingMessage: Some("Loading..."), currentUser: None},
-    didMount: ({send}) => {
-      fetchCurrentUser(user => {
-        send(UserLoaded(user));
-        send(Loaded);
-      });
+    didMount: ({ReasonReact.send}) => {
+      fetchCurrentUser(send);
       Gapi.load(~libs="auth2:client", ~callback=() => send(Loaded));
       ReasonReact.NoUpdate;
     },

@@ -1,9 +1,11 @@
-type t = {id: int};
+module User = {
+  type t = {id: int};
+};
 
 module UserDecoder =
   JsonApi.MakeDecoder(
     {
-      type model = t;
+      type model = User.t;
       type attributes = option({.});
       let attributesDecoder = (_json: Js.Json.t) : attributes => None;
       let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : model => {
@@ -12,10 +14,15 @@ module UserDecoder =
     }
   );
 
-let fetch = (callback: t => unit) =>
+let fetch = (callback : Callback.t(User.t, unit)) =>
   Api.request(
     ~method=Fetch.Get,
     ~path="/users/me",
-    ~callback=json => callback(json |> UserDecoder.decodeOne),
+    ~callback=
+      response =>
+        switch response {
+        | Success(json) => callback(Success(json |> UserDecoder.decodeOne))
+        | Error(error) => callback(Error(error))
+        },
     ()
   );

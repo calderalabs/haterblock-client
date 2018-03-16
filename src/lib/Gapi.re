@@ -1,3 +1,9 @@
+type response = {
+  .
+  "code": string,
+  [@bs.return nullable] "error": option(string)
+};
+
 type gapi = {
   .
   [@bs.meth] "load": (string, unit => unit) => unit,
@@ -12,7 +18,7 @@ type gapi = {
           "scope": string,
           "response_type": string
         },
-        {. "code": string} => unit
+        response => unit
       ) =>
       unit
   }
@@ -28,10 +34,10 @@ let authorize =
       ~clientId: string,
       ~scope: string,
       ~responseType: string,
-      ~callback: string => unit
+      ~callback: response => unit
     ) =>
   gapi##auth2##authorize(
     {"client_id": clientId, "scope": scope, "response_type": responseType},
     response =>
-    callback(response##code)
+    callback(response)
   );
