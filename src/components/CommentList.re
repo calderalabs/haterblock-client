@@ -1,4 +1,4 @@
-[%bs.raw {|require('./Comment.css')|}];
+[%bs.raw {|require('./CommentList.css')|}];
 
 let component = ReasonReact.statelessComponent("CommentList");
 
