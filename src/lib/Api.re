@@ -6,13 +6,13 @@ let baseUrl =
   | _ => "http://localhost:4000"
   };
 
-let _requestHeaders = () => {
+let requestHeaders = () => {
   let headers = [
     ("Accept", "application/json"),
     ("Content-Type", "application/json"),
     ("X-Requested-With", "XMLHttpRequest")
   ];
-  let token = Dom.Storage.getItem("token", Dom.Storage.localStorage);
+  let token = Dom.Storage.(getItem("token", localStorage));
   (
     switch token {
     | Some(token) => [("Authorization", {j|Bearer $(token)|j}), ...headers]
@@ -41,7 +41,7 @@ let request =
       {j|$(baseUrl)$(path)|j},
       Fetch.RequestInit.make(
         ~method_=method,
-        ~headers=Fetch.HeadersInit.makeWithArray(_requestHeaders()),
+        ~headers=Fetch.HeadersInit.makeWithArray(requestHeaders()),
         ~body=?initBody,
         ()
       )
