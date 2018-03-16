@@ -2,12 +2,12 @@
 
 type state = {
   loadingMessage: option(string),
-  currentUser: option(UserData.t)
+  currentUser: option(UserData.User.t)
 };
 
 type action =
   | Login
-  | UserLoaded(UserData.t)
+  | UserLoaded(UserData.User.t)
   | Loading(string)
   | Loaded;
 

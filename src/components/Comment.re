@@ -2,7 +2,7 @@
 
 let component = ReasonReact.statelessComponent("Comment");
 
-let sentimentToClass = (sentiment: CommentData.sentiment) =>
+let sentimentToClass = (sentiment: CommentData.Sentiment.t) =>
   switch sentiment {
   | Hateful => "hateful"
   | Negative => "negative"
@@ -10,8 +10,8 @@ let sentimentToClass = (sentiment: CommentData.sentiment) =>
   | Positive => "positive"
   };
 
-let make = (~comment: CommentData.t, _children) => {
-  let sentiment = sentimentToClass(CommentData.sentiment(comment));
+let make = (~comment: CommentData.Comment.t, _children) => {
+  let sentiment = sentimentToClass(CommentData.Sentiment.sentiment(comment));
   {
     ...component,
     render: _self =>
