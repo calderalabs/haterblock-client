@@ -43,6 +43,12 @@ module Sentiment = {
     };
 
   let sentiment = (comment: Comment.t) => sentimentMap(comment.score);
+
+  let filterBySentiment = (comments: array(Comment.t), filter: t) =>
+    comments
+    |> Array.to_list
+    |> List.filter(comment => sentiment(comment) == filter)
+    |> Array.of_list;
 };
 
 module CommentDecoder =

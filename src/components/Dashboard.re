@@ -17,14 +17,6 @@ let comments: array(CommentData.Comment.t) = [|
   {id: 6, body: "This is really good", score: 5, videoId: 0}
 |];
 
-let filterBySentiment = (sentiment: CommentData.Sentiment.t, comments: array(CommentData.Comment.t)) =>
-  comments
-  |> Array.to_list
-  |> List.filter(comment =>
-      CommentData.Sentiment.sentiment(comment) == sentiment
-     )
-  |> Array.of_list;
-
 let make = (~user: UserData.User.t, _children) => {
   let loadComments = ({ReasonReact.send}) => send(CommentsLoaded(comments));
   {
@@ -47,14 +39,15 @@ let make = (~user: UserData.User.t, _children) => {
           | None =>
             ReasonReact.stringToElement("There are no comments to display")
           | Some(comments) =>
+            let filterBySentiment = CommentData.Sentiment.filterBySentiment(comments);
             <div>
-              <CommentList comments=(comments |> filterBySentiment(Positive)) />
-              <CommentList comments=(comments |> filterBySentiment(Neutral)) />
+              <CommentList comments=(filterBySentiment(Positive)) />
+              <CommentList comments=(filterBySentiment(Neutral)) />
               <CommentList
-                comments=(comments |> filterBySentiment(Negative))
+                comments=(filterBySentiment(Negative))
               />
               <CommentList
-                comments=(comments |> filterBySentiment(Hateful))
+                comments=(filterBySentiment(Hateful))
               />
             </div>
           }
