@@ -17,11 +17,11 @@ let comments: array(CommentData.Comment.t) = [|
   {id: 6, body: "This is really good", score: 5, videoId: 0}
 |];
 
-let filterBetweenScore = (maxScore, minScore, comments) =>
+let filterBySentiment = (sentiment: CommentData.Sentiment.t, comments: array(CommentData.Comment.t)) =>
   comments
   |> Array.to_list
   |> List.filter(comment =>
-       CommentData.Comment.(comment.score >= minScore && comment.score <= maxScore)
+      CommentData.Sentiment.sentiment(comment) == sentiment
      )
   |> Array.of_list;
 
@@ -48,10 +48,13 @@ let make = (~user: UserData.User.t, _children) => {
             ReasonReact.stringToElement("There are no comments to display")
           | Some(comments) =>
             <div>
-              <CommentList comments=(comments |> filterBetweenScore(10, 1)) />
-              <CommentList comments=(comments |> filterBetweenScore(0, -5)) />
+              <CommentList comments=(comments |> filterBySentiment(Positive)) />
+              <CommentList comments=(comments |> filterBySentiment(Neutral)) />
               <CommentList
-                comments=(comments |> filterBetweenScore(-6, -10))
+                comments=(comments |> filterBySentiment(Negative))
+              />
+              <CommentList
+                comments=(comments |> filterBySentiment(Hateful))
               />
             </div>
           }
