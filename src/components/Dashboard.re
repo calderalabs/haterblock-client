@@ -14,7 +14,7 @@ let comments: array(CommentData.Comment.t) = [|
   {id: 4, body: "This is fucking shit", score: (-8), videoId: 0},
   {id: 5, body: "You should kill yourself", score: (-7), videoId: 0},
   {id: 6, body: "This is total garbage", score: (-9), videoId: 0},
-  {id: 6, body: "This is really good", score: 5, videoId: 0}
+  {id: 7, body: "This is really good", score: 5, videoId: 0}
 |];
 
 let make = (~user: UserData.User.t, _children) => {
@@ -39,17 +39,14 @@ let make = (~user: UserData.User.t, _children) => {
           | None =>
             ReasonReact.stringToElement("There are no comments to display")
           | Some(comments) =>
-            let filterBySentiment = CommentData.Sentiment.filterBySentiment(comments);
+            let filterBySentiment =
+              CommentData.Sentiment.filterBySentiment(comments);
             <div>
               <CommentList comments=(filterBySentiment(Positive)) />
               <CommentList comments=(filterBySentiment(Neutral)) />
-              <CommentList
-                comments=(filterBySentiment(Negative))
-              />
-              <CommentList
-                comments=(filterBySentiment(Hateful))
-              />
-            </div>
+              <CommentList comments=(filterBySentiment(Negative)) />
+              <CommentList comments=(filterBySentiment(Hateful)) />
+            </div>;
           }
         )
       </div>
