@@ -14,10 +14,15 @@ module UserDecoder =
     }
   );
 
-let fetch = (callback: User.t => unit) =>
+let fetch = (callback : Callback.t(User.t, unit)) =>
   Api.request(
     ~method=Fetch.Get,
     ~path="/users/me",
-    ~callback=json => callback(json |> UserDecoder.decodeOne),
+    ~callback=
+      response =>
+        switch response {
+        | Success(json) => callback(Success(json |> UserDecoder.decodeOne))
+        | Error(error) => callback(Error(error))
+        },
     ()
   );

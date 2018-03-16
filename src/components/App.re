@@ -14,28 +14,26 @@ type action =
 let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
-  let fetchCurrentUser = callback => UserData.fetch(callback);
+  let fetchCurrentUser = (send) =>
+    UserData.fetch((user => {
+      send(UserLoaded(user));
+      send(Loaded);
+    }) |> Callback.ignoreError);
+
   let login = ({ReasonReact.send}) => {
     send(Loading("Logging in..."));
     Session.login(response =>
       switch response {
-      | Success =>
-        fetchCurrentUser(user => {
-          send(UserLoaded(user));
-          send(Loaded);
-        })
-      | Error => send(Loaded)
+      | Success() => fetchCurrentUser(send)
+      | Error(_error) => send(Loaded)
       }
     );
   };
   {
     ...component,
     initialState: () => {loadingMessage: Some("Loading..."), currentUser: None},
-    didMount: ({send}) => {
-      fetchCurrentUser(user => {
-        send(UserLoaded(user));
-        send(Loaded);
-      });
+    didMount: ({ReasonReact.send}) => {
+      fetchCurrentUser(send);
       Gapi.load(~libs="auth2:client", ~callback=() => send(Loaded));
       ReasonReact.NoUpdate;
     },

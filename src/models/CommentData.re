@@ -9,41 +9,20 @@ module Comment = {
 
 module Sentiment = {
   type t =
-  | Hateful
-  | Negative
-  | Neutral
-  | Positive;
-
+    | Hateful
+    | Negative
+    | Neutral
+    | Positive;
   exception InvalidSentiment;
-
   let sentimentMap = score =>
     switch score {
-    | 10
-    | 9
-    | 8
-    | 7
-    | 6
-    | 5 => Positive
-    | 4
-    | 3
-    | 2
-    | 1
-    | 0
-    | -1
-    | -2
-    | -3 => Neutral
-    | -4
-    | -5
-    | -6 => Negative
-    | -7
-    | -8
-    | -9
-    | -10 => Hateful
+    | x when x >= 5 && x <= 10 => Positive
+    | x when x >= (-3) && x <= 4 => Neutral
+    | x when x >= (-6) && x <= (-4) => Negative
+    | x when x >= (-10) && x <= (-7) => Hateful
     | _ => raise(InvalidSentiment)
     };
-
   let sentiment = (comment: Comment.t) => sentimentMap(comment.score);
-
   let filterBySentiment = (comments: array(Comment.t), filter: t) =>
     comments
     |> Array.to_list
@@ -71,10 +50,38 @@ module CommentDecoder =
     }
   );
 
-let fetchAll = (callback: array(Comment.t) => unit) =>
+let fetchAll = (callback: Callback.t(array(Comment.t), unit)) =>
   Api.request(
     ~method=Fetch.Get,
     ~path="/comments",
-    ~callback=json => callback(json |> CommentDecoder.decodeMany),
+    ~callback=
+      response =>
+        switch response {
+        | Success(json) => callback(Success(json |> CommentDecoder.decodeMany))
+        | Error(_error) => callback(Error())
+        },
     ()
   );
+
+let reject = (callback: Callback.t(unit, unit), comment: Comment.t) => {
+  let id = comment.id;
+  Api.request(
+    ~method=Fetch.Put,
+    ~path={j|/comments/$id|j},
+    ~body=[
+      (
+        "comment",
+        Json.Encode.dict(
+          Js.Dict.fromList([("rejected", Json.Encode.bool(true))])
+        )
+      )
+    ],
+    ~callback=
+      response =>
+        switch response {
+        | Success(_json) => callback(Success())
+        | Error(_error) => callback(Error())
+        },
+    ()
+  );
+};

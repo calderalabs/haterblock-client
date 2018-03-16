@@ -26,7 +26,7 @@ let request =
     (
       ~method: Fetch.requestMethod,
       ~path: string,
-      ~callback: option(Js.Json.t => unit)=?,
+      ~callback: option(Callback.t(Js.Json.t, unit))=?,
       ~body: option(list((string, Js.Json.t)))=?,
       ()
     ) => {
@@ -49,7 +49,7 @@ let request =
     |> then_(Fetch.Response.json)
     |> then_(json => {
          switch callback {
-         | Some(callback) => callback(json)
+         | Some(callback) => callback(Success(json))
          | None => ()
          };
          resolve();
