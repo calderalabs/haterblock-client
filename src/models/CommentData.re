@@ -30,7 +30,7 @@ module Sentiment = {
     |> Array.of_list;
 };
 
-module CommentDecoder =
+include
   JsonApi.MakeDecoder(
     {
       type model = Comment.t;
@@ -57,7 +57,7 @@ let fetchAll = (callback: Callback.t(array(Comment.t), unit)) =>
     ~callback=
       response =>
         switch response {
-        | Success(json) => callback(Success(json |> CommentDecoder.decodeMany))
+        | Success(json) => callback(Success(json |> decodeMany))
         | Error(_error) => callback(Error())
         },
     ()
