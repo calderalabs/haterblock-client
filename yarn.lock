@@ -4559,6 +4559,12 @@ klaw@^1.0.0:
   optionalDependencies:
     graceful-fs "^4.1.9"
 
+ladda@^1.0.0:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/ladda/-/ladda-1.0.6.tgz#c4a3cb7fac326061d8c04bece01587fbc45db321"
+  dependencies:
+    spin.js "^2.0.0"
+
 latest-version@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/latest-version/-/latest-version-3.1.0.tgz#a205383fea322b33b5ae3b18abee0dc2f356ee15"
@@ -5840,7 +5846,7 @@ promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
-prop-types@^15.5.10, prop-types@^15.6.0:
+prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0:
   version "15.6.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.1.tgz#36644453564255ddda391191fb3a125cbdf654ca"
   dependencies:
@@ -6003,6 +6009,13 @@ react-dev-utils@^4.2.1:
 react-error-overlay@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-3.0.0.tgz#c2bc8f4d91f1375b3dad6d75265d51cd5eeaf655"
+
+react-ladda@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/react-ladda/-/react-ladda-6.0.0.tgz#016f092db05fef179040380b00b50a89e463e506"
+  dependencies:
+    ladda "^1.0.0"
+    prop-types "^15.5.8"
 
 "react@>=15.0.0 || >=16.0.0", react@^16.2.0:
   version "16.2.0"
@@ -6783,6 +6796,10 @@ spdy@^3.4.1:
     safe-buffer "^5.0.1"
     select-hose "^2.0.0"
     spdy-transport "^2.0.18"
+
+spin.js@^2.0.0:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/spin.js/-/spin.js-2.3.2.tgz#6caa56d520673450fd5cfbc6971e6d0772c37a1a"
 
 split-string@^3.0.1, split-string@^3.0.2:
   version "3.1.0"

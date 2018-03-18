@@ -2,7 +2,7 @@
 
 type state = {rejected: bool};
 
-type actions =
+type action =
   | Reject;
 
 let component = ReasonReact.reducerComponent("Comment");
@@ -17,8 +17,19 @@ let sentimentToEmoji = (sentiment: CommentData.Sentiment.t) =>
 
 let make = (~comment: CommentData.Comment.t, _children) => {
   let sentiment = sentimentToEmoji(CommentData.Sentiment.sentiment(comment));
-  let reject = (_event, {ReasonReact.send}) =>
-    comment |> CommentData.reject((() => send(Reject)) |> Callback.ignoreError);
+  let reject = ({ReasonReact.send}, callback: Callback.t(unit, unit)) =>
+    comment
+    |> CommentData.reject(
+        (
+          (response) => {
+            switch response {
+            | Success() => send(Reject)
+            | _ => ()
+            };
+            callback(response);
+          }
+        )
+      );
   {
     ...component,
     initialState: () => {rejected: false},
@@ -26,7 +37,7 @@ let make = (~comment: CommentData.Comment.t, _children) => {
       switch action {
       | Reject => ReasonReact.Update({rejected: true})
       },
-    render: ({ReasonReact.state, handle}) =>
+    render: (self) =>
       <div className="Comment">
         <div className="Comment__sentiment">
           (ReasonReact.stringToElement(sentiment))
@@ -36,11 +47,11 @@ let make = (~comment: CommentData.Comment.t, _children) => {
         </div>
         <div className="Comment__actions">
           (
-            state.rejected ?
+            self.state.rejected ?
               ReasonReact.stringToElement("Rejected") :
-              <button onClick=(handle(reject))>
+              <AsyncButton onClick=reject(self)>
                 (ReasonReact.stringToElement("Reject"))
-              </button>
+              </AsyncButton>
           )
         </div>
       </div>

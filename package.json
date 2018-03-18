@@ -7,6 +7,7 @@
     "bs-json": "^1.0.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-ladda": "^6.0.0",
     "reason-scripts": "0.8.0"
   },
   "scripts": {
