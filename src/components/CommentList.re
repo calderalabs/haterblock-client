@@ -27,15 +27,15 @@ let make = (~comments: array(CommentData.Comment.t), _children) => {
     reducer: (action, state) =>
       switch action {
       | Reject(rejectedComment, callback) =>
+        let updateComment = comment =>
+          switch comment {
+          | comment when comment == rejectedComment => {...comment, rejected: true}
+          | _ => comment
+          };
         let updatedComments =
-          CommentData.Comment.(
+          (
             state.comments
-            |> Array.map(comment =>
-                 switch comment {
-                 | rejectedComment => {...comment, rejected: true}
-                 | _ => comment
-                 }
-               )
+            |> Array.map(updateComment)
           );
         ReasonReact.UpdateWithSideEffects(
           {comments: updatedComments},
