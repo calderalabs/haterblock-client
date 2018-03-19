@@ -3,7 +3,8 @@ module Comment = {
     id: int,
     body: string,
     score: int,
-    videoId: int
+    videoId: int,
+    rejected: bool
   };
 };
 
@@ -39,12 +40,19 @@ include
         Json.Decode.{body: json |> field("body", string)};
       let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : model =>
         switch resource.attributes {
-        | None => {id: resource.id, body: "", score: 0, videoId: 0}
+        | None => {
+            id: resource.id,
+            body: "",
+            score: 0,
+            videoId: 0,
+            rejected: false
+          }
         | Some(attributes) => {
             id: resource.id,
             body: attributes.body,
             score: 0,
-            videoId: 0
+            videoId: 0,
+            rejected: false
           }
         };
     }

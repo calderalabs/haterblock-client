@@ -1,19 +1,55 @@
 [%bs.raw {|require('./CommentList.css')|}];
 
-let component = ReasonReact.statelessComponent("CommentList");
+type state = {comments: array(CommentData.Comment.t)};
+
+type action =
+  | Reject(CommentData.Comment.t);
+
+let component = ReasonReact.reducerComponent("CommentList");
 
 let make = (~comments: array(CommentData.Comment.t), _children) => {
-  ...component,
-  render: _self =>
-    <div className="CommentList">
-      (
-        comments
-        |> Array.map(comment =>
-             CommentData.Comment.(
-               <div key=(string_of_int(comment.id))> <Comment comment /> </div>
-             )
-           )
-        |> ReasonReact.arrayToElement
-      )
-    </div>
+  let reject = (comment: CommentData.Comment.t, {ReasonReact.send}, callback: Callback.t(unit, unit)) =>
+    comment
+    |> CommentData.reject(
+        (
+          (response) => {
+            switch response {
+            | Success() => send(Reject(comment))
+            | _ => ()
+            };
+            callback(response);
+          }
+        )
+      );
+
+  {
+    ...component,
+    initialState: () => {comments: comments},
+    reducer: (action, state) =>
+      switch action {
+      | Reject(rejectedComment) => {
+        let updatedComments = CommentData.Comment.(
+          state.comments |> Array.map((comment) =>
+            switch comment {
+            | rejectedComment => {...comment, rejected: true}
+            | _ => comment
+            }
+          )
+        );
+        ReasonReact.Update({comments: updatedComments});
+      }
+      },
+    render: self =>
+      <div className="CommentList">
+        (
+          self.state.comments
+          |> Array.map(comment =>
+              CommentData.Comment.(
+                <div key=(string_of_int(comment.id))> <Comment comment onReject=(reject(comment, self)) /> </div>
+              )
+            )
+          |> ReasonReact.arrayToElement
+        )
+      </div>
+  };
 };
