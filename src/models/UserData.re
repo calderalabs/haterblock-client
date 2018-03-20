@@ -1,3 +1,5 @@
+open Belt;
+
 module User = {
   type t = {id: int};
 };
@@ -14,7 +16,7 @@ include
     }
   );
 
-let fetch = (callback: Callback.t(User.t, unit)) =>
+let fetch = (callback: Callback.t(User.t, string)) =>
   Api.request(
     ~method=Fetch.Get,
     ~path="/users/me",

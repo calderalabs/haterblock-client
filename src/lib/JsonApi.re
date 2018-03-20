@@ -1,3 +1,5 @@
+open Belt;
+
 open Json.Decode;
 
 module Resource = {
@@ -13,7 +15,7 @@ module Resource = {
 
 module Document = {
   type one('a) = {data: Resource.t('a)};
-  type many('a) = {data: array(Resource.t('a))};
+  type many('a) = {data: list(Resource.t('a))};
   let decodeOne =
       (resourceDecoder: Js.Json.t => Resource.t('a), json: Js.Json.t)
       : one('a) => {
@@ -22,7 +24,7 @@ module Document = {
   let decodeMany =
       (resourceDecoder: Js.Json.t => Resource.t('a), json: Js.Json.t)
       : many('a) => {
-    data: json |> field("data", array(resourceDecoder))
+    data: json |> field("data", list(resourceDecoder))
   };
 };
 
@@ -36,7 +38,7 @@ module type Decodable = {
 module type Decoder = {
   type t;
   let decodeOne: Js.Json.t => t;
-  let decodeMany: Js.Json.t => array(t);
+  let decodeMany: Js.Json.t => list(t);
 };
 
 module MakeDecoder =
@@ -49,7 +51,7 @@ module MakeDecoder =
     Document.decodeOne(resourceDecoder, json).data
     |> Decodable.resourceToRecord;
 
-  let decodeMany = (json: Js.Json.t) : array(t) =>
+  let decodeMany = (json: Js.Json.t) : list(t) =>
     Document.decodeMany(resourceDecoder, json).data
-    |> Array.map(Decodable.resourceToRecord);
+    |> List.map(_, Decodable.resourceToRecord);
 };

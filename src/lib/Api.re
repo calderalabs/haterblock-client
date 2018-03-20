@@ -1,3 +1,7 @@
+open Belt;
+
+exception RequestFailed;
+
 [@bs.val] external environment : string = "process.env.NODE_ENV";
 
 let baseUrl =
@@ -19,14 +23,14 @@ let requestHeaders = () => {
     | None => headers
     }
   )
-  |> Array.of_list;
+  |> List.toArray;
 };
 
 let request =
     (
       ~method: Fetch.requestMethod,
       ~path: string,
-      ~callback: option(Callback.t(Js.Json.t, unit))=?,
+      ~callback: option(Callback.t(Js.Json.t, string))=?,
       ~body: option(list((string, Js.Json.t)))=?,
       ()
     ) => {
@@ -46,12 +50,32 @@ let request =
         ()
       )
     )
+    |> then_(response =>
+         if (Fetch.Response.ok(response)) {
+           resolve(response);
+         } else {
+           switch callback {
+           | Some(callback) =>
+             callback(Error(Fetch.Response.statusText(response)))
+           | None => ()
+           };
+           reject(RequestFailed);
+         }
+       )
     |> then_(Fetch.Response.json)
     |> then_(json => {
          switch callback {
          | Some(callback) => callback(Success(json))
          | None => ()
          };
+         resolve();
+       })
+    |> catch(error => {
+         switch callback {
+         | Some(callback) => callback(Error(""))
+         | None => ()
+         };
+         Js.log(error);
          resolve();
        })
   )

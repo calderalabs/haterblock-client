@@ -1,3 +1,5 @@
+open Belt;
+
 [%bs.raw {|require('./App.css')|}];
 
 type state = {
