@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@glennsl/bs-json": "^1.0.1",
     "bs-fetch": "^0.2.1",
-    "bs-json": "^1.0.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-ladda": "^6.0.0",
@@ -20,7 +20,8 @@
     "invalidate-cache": "aws cloudfront create-invalidation --distribution-id $(terraform output cdn_id) --paths /index.html"
   },
   "devDependencies": {
-    "bs-jest": "^0.3.2",
+    "@glennsl/bs-jest": "^0.4.2",
+    "bs-platform": "^2.2.3",
     "reason-react": "^0.3.2"
   }
 }
