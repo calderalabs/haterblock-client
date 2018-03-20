@@ -8,6 +8,9 @@ module Comment = {
     videoId: int,
     rejected: bool
   };
+
+  let forIds = (comments: list(t), ids: list(int)) =>
+    comments |> List.keep(_, (comment) => ids |> List.has(_, comment.id, (==)));
 };
 
 module Sentiment = {
@@ -74,15 +77,7 @@ let reject = (callback: Callback.t(unit, unit), comment: Comment.t) => {
   let id = comment.id;
   Api.request(
     ~method=Fetch.Put,
-    ~path={j|/comments/$id|j},
-    ~body=[
-      (
-        "comment",
-        Json.Encode.dict(
-          Js.Dict.fromList([("rejected", Json.Encode.bool(true))])
-        )
-      )
-    ],
+    ~path={j|/rejections/$id|j},
     ~callback=
       response =>
         switch response {
@@ -90,5 +85,25 @@ let reject = (callback: Callback.t(unit, unit), comment: Comment.t) => {
         | Error(_error) => callback(Error())
         },
     ()
+  );
+};
+
+let rejectAll = (callback: Callback.t(unit, unit), ids: list(int)) => {
+  Api.request(
+    ~method=Fetch.Post,
+    ~path="/rejections",
+    ~body=[
+      Json.Encode.(
+        "ids",
+        list(int, ids)
+      )
+    ],
+    ~callback=
+    response =>
+      switch response {
+      | Success(_json) => callback(Success())
+      | Error(_error) => callback(Error())
+      },
+  ()
   );
 };

@@ -8,7 +8,7 @@ type state = {
 };
 
 type action =
-  | Reject(CommentData.Comment.t, unit => unit)
+  | Reject(list(CommentData.Comment.t), unit => unit)
   | ToggleForRejection(CommentData.Comment.t);
 
 let component = ReasonReact.reducerComponent("CommentList");
@@ -23,25 +23,20 @@ let make = (~comments: list(CommentData.Comment.t), _children) => {
     comment
     |> CommentData.reject(response =>
          switch response {
-         | Success () => send(Reject(comment, () => callback(response)))
-         | _ => callback(response)
+         | Success () => send(Reject([comment], () => callback(response)))
+         | Error () => callback(response)
          }
        );
-  let rejectMarked = (_event, self) =>
-    self.ReasonReact.state.comments
-    |> List.keep(_, comment =>
-         List.has(self.state.markedForRejection, comment.CommentData.Comment.id, (==))
-       )
-    |> List.map(_, comment =>
-         comment
-         |> CommentData.reject(response =>
-              switch response {
-              | Success () => self.send(Reject(comment, () => ()))
-              | _ => ()
-              }
-            )
-       )
-    |> ignore;
+  let rejectMarked = (self, callback: Callback.t(unit, unit)) => {
+    let markedForRejection = self.ReasonReact.state.markedForRejection;
+
+    markedForRejection |> CommentData.rejectAll(response =>
+      switch response {
+      | Success () => self.send(Reject(CommentData.Comment.forIds(self.state.comments, markedForRejection), () => callback(response)))
+      | Error () => callback(response)
+      }
+    );
+  };
   let isMarkedForRejection =
       (markedForRejection: list(int), comment: CommentData.Comment.t) =>
     markedForRejection |> List.has(_, comment.id, (==));
@@ -50,9 +45,9 @@ let make = (~comments: list(CommentData.Comment.t), _children) => {
     initialState: () => {comments, markedForRejection: []},
     reducer: (action, state) =>
       switch action {
-      | Reject(rejectedComment, callback) =>
+      | Reject(rejectedComments, callback) =>
         let updateComment = comment =>
-          comment == rejectedComment ?
+          List.has(state.markedForRejection, comment.CommentData.Comment.id, (==)) ?
             {...comment, rejected: true} : comment;
         let updatedComments = state.comments |> List.map(_, updateComment);
         ReasonReact.UpdateWithSideEffects(
@@ -100,9 +95,9 @@ let make = (~comments: list(CommentData.Comment.t), _children) => {
           )
         </div>
         <div className="Actions">
-          <button onClick=(self.handle(rejectMarked))>
+          <AsyncButton onClick=(rejectMarked(self))>
             (ReasonReact.stringToElement("Reject Marked"))
-          </button>
+          </AsyncButton>
         </div>
       </div>
   };
