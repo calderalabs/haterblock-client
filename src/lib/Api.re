@@ -1,3 +1,5 @@
+open Belt;
+
 [@bs.val] external environment : string = "process.env.NODE_ENV";
 
 let baseUrl =
@@ -19,7 +21,7 @@ let requestHeaders = () => {
     | None => headers
     }
   )
-  |> Array.of_list;
+  |> List.toArray;
 };
 
 let request =

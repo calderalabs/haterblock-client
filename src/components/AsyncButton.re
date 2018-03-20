@@ -1,3 +1,5 @@
+open Belt;
+
 [%bs.raw {|require('./AsyncButton.css')|}];
 
 type state = {loading: bool};
@@ -13,7 +15,6 @@ let make = (~onClick: Callback.action(unit, unit), children) => {
     send(Loading);
     onClick((() => send(Loaded)) |> Callback.finally);
   };
-
   {
     ...component,
     initialState: () => {loading: false},
@@ -23,6 +24,8 @@ let make = (~onClick: Callback.action(unit, unit), children) => {
       | Loaded => ReasonReact.Update({loading: false})
       },
     render: ({ReasonReact.handle, state}) =>
-      <LaddaButton onClick=(handle(onLaddaClick)) loading=state.loading> children </LaddaButton>
+      <LaddaButton onClick=(handle(onLaddaClick)) loading=state.loading>
+        children
+      </LaddaButton>
   };
 };

@@ -1,3 +1,5 @@
+open Belt;
+
 type t = {token: string};
 
 let decode = (json: Js.Json.t) =>

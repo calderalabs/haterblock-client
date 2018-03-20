@@ -1,3 +1,5 @@
+open Belt;
+
 [%bs.raw {|require('./Comment.css')|}];
 
 let component = ReasonReact.statelessComponent("Comment");
@@ -10,7 +12,12 @@ let sentimentToEmoji = (sentiment: CommentData.Sentiment.t) =>
   | Positive => {js|🙂|js}
   };
 
-let make = (~comment: CommentData.Comment.t, ~onReject: Callback.action(unit, unit), _children) => {
+let make =
+    (
+      ~comment: CommentData.Comment.t,
+      ~onReject: Callback.action(unit, unit),
+      _children
+    ) => {
   let sentiment = sentimentToEmoji(CommentData.Sentiment.sentiment(comment));
   {
     ...component,

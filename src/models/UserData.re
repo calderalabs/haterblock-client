@@ -1,3 +1,5 @@
+open Belt;
+
 module User = {
   type t = {id: int};
 };

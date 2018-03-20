@@ -1,13 +1,15 @@
+open Belt;
+
 [%bs.raw {|require('./Dashboard.css')|}];
 
-type state = {comments: option(array(CommentData.Comment.t))};
+type state = {comments: option(list(CommentData.Comment.t))};
 
 type action =
-  | CommentsLoaded(array(CommentData.Comment.t));
+  | CommentsLoaded(list(CommentData.Comment.t));
 
 let component = ReasonReact.reducerComponent("Dashboard");
 
-let comments: array(CommentData.Comment.t) = [|
+let comments: list(CommentData.Comment.t) = [
   {id: 1, body: "I don't like this", score: (-6), videoId: 0, rejected: false},
   {
     id: 2,
@@ -45,7 +47,7 @@ let comments: array(CommentData.Comment.t) = [|
     rejected: false
   },
   {id: 7, body: "This is really good", score: 5, videoId: 0, rejected: false}
-|];
+];
 
 let make = (~user: UserData.User.t, _children) => {
   let loadComments = ({ReasonReact.send}) => send(CommentsLoaded(comments));

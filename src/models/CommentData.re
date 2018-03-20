@@ -1,3 +1,5 @@
+open Belt;
+
 module Comment = {
   type t = {
     id: int,
@@ -24,11 +26,8 @@ module Sentiment = {
     | _ => raise(InvalidSentiment)
     };
   let sentiment = (comment: Comment.t) => sentimentMap(comment.score);
-  let filterBySentiment = (comments: array(Comment.t), filter: t) =>
-    comments
-    |> Array.to_list
-    |> List.filter(comment => sentiment(comment) == filter)
-    |> Array.of_list;
+  let filterBySentiment = (comments: list(Comment.t), filter: t) =>
+    comments |> List.keep(_, comment => sentiment(comment) == filter);
 };
 
 include
@@ -58,7 +57,7 @@ include
     }
   );
 
-let fetchAll = (callback: Callback.t(array(Comment.t), unit)) =>
+let fetchAll = (callback: Callback.t(list(Comment.t), unit)) =>
   Api.request(
     ~method=Fetch.Get,
     ~path="/comments",
