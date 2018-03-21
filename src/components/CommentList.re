@@ -30,9 +30,15 @@ let make = (~comments: list(CommentData.Comment.t), _children) => {
   let rejectMarked = (self, callback: Callback.t(unit, unit)) => {
     let markedForRejection = self.ReasonReact.state.markedForRejection;
 
-    markedForRejection |> CommentData.rejectAll(response =>
+    markedForRejection
+    |> CommentData.rejectAll(response =>
       switch response {
-      | Success () => self.send(Reject(CommentData.Comment.forIds(self.state.comments, markedForRejection), () => callback(response)))
+      | Success () => {
+        self.send(Reject(
+          CommentData.Comment.forIds(self.state.comments, markedForRejection),
+          () => callback(response))
+        );
+      }
       | Error () => callback(response)
       }
     );
@@ -47,7 +53,7 @@ let make = (~comments: list(CommentData.Comment.t), _children) => {
       switch action {
       | Reject(rejectedComments, callback) =>
         let updateComment = comment =>
-          List.has(state.markedForRejection, comment.CommentData.Comment.id, (==)) ?
+          isMarkedForRejection(state.markedForRejection, comment) ?
             {...comment, rejected: true} : comment;
         let updatedComments = state.comments |> List.map(_, updateComment);
         ReasonReact.UpdateWithSideEffects(
