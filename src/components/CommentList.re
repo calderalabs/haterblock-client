@@ -61,48 +61,50 @@ let make = (~comments: list(CommentData.Comment.t), _children) => {
           (_self => callback())
         );
       | ToggleForRejection(comment) =>
-        let markedForRejection = state.markedForRejection;
         let markedForRejection =
-          isMarkedForRejection(markedForRejection, comment) ?
-            markedForRejection |> List.keep(_, id => comment.id != id) :
-            [comment.id, ...markedForRejection];
+          isMarkedForRejection(state.markedForRejection, comment) ?
+          state.markedForRejection |> List.keep(_, id => comment.id != id) :
+            [comment.id, ...state.markedForRejection];
         ReasonReact.Update({...state, markedForRejection});
       },
     render: self =>
       <div className="CommentList">
-        <div className="Comments">
+        <div className="CommentList__header">
+          <div>
+            <AsyncButton onClick=(rejectMarked(self))>
+              (ReasonReact.stringToElement("Reject Marked"))
+            </AsyncButton>
+          </div>
+        </div>
+        <div className="CommentList__comments">
           (
             self.state.comments
             |> List.map(_, comment =>
                  CommentData.Comment.(
                    <div key=(string_of_int(comment.id))>
-                     <Comment comment onReject=(reject(comment, self)) />
-                     <input
-                       name="markedForRejection"
-                       _type="checkbox"
-                       checked=(
-                         Js.Boolean.to_js_boolean(
-                           isMarkedForRejection(
-                             self.state.markedForRejection,
-                             comment
-                           )
-                         )
-                       )
-                       onChange=(
-                         _event => self.send(ToggleForRejection(comment))
-                       )
-                     />
+                     <Comment comment onReject=(reject(comment, self))>
+                      <input
+                        name="markedForRejection"
+                        _type="checkbox"
+                        checked=(
+                          Js.Boolean.to_js_boolean(
+                            isMarkedForRejection(
+                              self.state.markedForRejection,
+                              comment
+                            )
+                          )
+                        )
+                        onChange=(
+                          _event => self.send(ToggleForRejection(comment))
+                        )
+                      />
+                     </Comment>
                    </div>
                  )
                )
             |> List.toArray
             |> ReasonReact.arrayToElement
           )
-        </div>
-        <div className="Actions">
-          <AsyncButton onClick=(rejectMarked(self))>
-            (ReasonReact.stringToElement("Reject Marked"))
-          </AsyncButton>
         </div>
       </div>
   };

@@ -1,0 +1,12 @@
+.CommentList {
+  text-align: center;
+}
+
+.CommentList__header {
+  display: grid;
+  grid-template-columns: 100px auto;
+  background-color: #ccc;
+  grid-gap: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+}

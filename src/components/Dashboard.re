@@ -65,7 +65,6 @@ let make = (~user: UserData.User.t, _children) => {
     },
     render: ({state}) =>
       <div className="Dashboard">
-        <div> (ReasonReact.stringToElement(string_of_int(user.id))) </div>
         (
           switch state.comments {
           | None =>
