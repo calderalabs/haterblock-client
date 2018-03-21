@@ -89,9 +89,8 @@ let make = (~comments: list(CommentData.Comment.t), _children) => {
                    </div>
                  )
                )
-            |>
-            List.toArray |>
-            ReasonReact.arrayToElement
+            |> List.toArray
+            |> ReasonReact.arrayToElement
           )
         </div>
         <div className="Actions">
