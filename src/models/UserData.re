@@ -1,29 +1,26 @@
 open Belt;
 
 module User = {
-  type t = {id: int};
+  type t = {id: Model.id};
+  include
+    JsonApi.MakeDecoder(
+      {
+        type nonrec t = t;
+        type attributes = option({.});
+        let attributesDecoder = (_json: Js.Json.t) : attributes => None;
+        let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : t => {id: resource.id};
+      }
+    );
 };
-
-include
-  JsonApi.MakeDecoder(
-    {
-      type model = User.t;
-      type attributes = option({.});
-      let attributesDecoder = (_json: Js.Json.t) : attributes => None;
-      let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : model => {
-        id: resource.id
-      };
-    }
-  );
 
 let fetch = (callback: Callback.t(User.t, string)) =>
   Api.request(
     ~method=Fetch.Get,
     ~path="/users/me",
     ~callback=
-      response =>
+      (response) =>
         switch response {
-        | Success(json) => callback(Success(json |> decodeOne))
+        | Success(json) => callback(Success(json |> User.decodeOne))
         | Error(error) => callback(Error(error))
         },
     ()

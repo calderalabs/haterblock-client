@@ -4,7 +4,7 @@ open Json.Decode;
 
 module Resource = {
   type t('a) = {
-    id: int,
+    id: Model.id,
     attributes: option('a)
   };
   let decode = (decoder: Json.Decode.decoder('a), json: Js.Json.t) : t('a) => {
@@ -29,10 +29,10 @@ module Document = {
 };
 
 module type Decodable = {
-  type model;
+  type t;
   type attributes;
   let attributesDecoder: Js.Json.t => attributes;
-  let resourceToRecord: Resource.t(attributes) => model;
+  let resourceToRecord: Resource.t(attributes) => t;
 };
 
 module type Decoder = {
@@ -43,8 +43,8 @@ module type Decoder = {
 
 module MakeDecoder =
        (Decodable: Decodable)
-       : (Decoder with type t := Decodable.model) => {
-  type t = Decodable.model;
+       : (Decoder with type t := Decodable.t) => {
+  type t = Decodable.t;
   let resourceDecoder = Resource.decode(Decodable.attributesDecoder);
 
   let decodeOne = (json: Js.Json.t) : t =>

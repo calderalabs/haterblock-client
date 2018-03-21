@@ -2,14 +2,41 @@ open Belt;
 
 module Comment = {
   type t = {
-    id: int,
+    id: Model.id,
     body: string,
     score: int,
     videoId: int,
     rejected: bool
   };
 
-  let forIds = (comments: list(t), ids: list(int)) =>
+  include
+    JsonApi.MakeDecoder(
+      {
+        type nonrec t = t;
+        type attributes = {body: string};
+        let attributesDecoder = (json: Js.Json.t) : attributes =>
+          Json.Decode.{body: json |> field("body", string)};
+        let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : t =>
+          switch resource.attributes {
+          | None => {
+              id: resource.id,
+              body: "",
+              score: 0,
+              videoId: 0,
+              rejected: false
+            }
+          | Some(attributes) => {
+              id: resource.id,
+              body: attributes.body,
+              score: 0,
+              videoId: 0,
+              rejected: false
+            }
+          };
+      }
+    );
+
+  let forIds = (comments: list(t), ids: list(Model.id)) =>
     comments |> List.keep(_, (comment) => ids |> List.has(_, comment.id, (==)));
 };
 
@@ -33,33 +60,6 @@ module Sentiment = {
     comments |> List.keep(_, comment => sentiment(comment) == filter);
 };
 
-include
-  JsonApi.MakeDecoder(
-    {
-      type model = Comment.t;
-      type attributes = {body: string};
-      let attributesDecoder = (json: Js.Json.t) : attributes =>
-        Json.Decode.{body: json |> field("body", string)};
-      let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : model =>
-        switch resource.attributes {
-        | None => {
-            id: resource.id,
-            body: "",
-            score: 0,
-            videoId: 0,
-            rejected: false
-          }
-        | Some(attributes) => {
-            id: resource.id,
-            body: attributes.body,
-            score: 0,
-            videoId: 0,
-            rejected: false
-          }
-        };
-    }
-  );
-
 let fetchAll = (callback: Callback.t(list(Comment.t), unit)) =>
   Api.request(
     ~method=Fetch.Get,
@@ -67,7 +67,7 @@ let fetchAll = (callback: Callback.t(list(Comment.t), unit)) =>
     ~callback=
       response =>
         switch response {
-        | Success(json) => callback(Success(json |> decodeMany))
+        | Success(json) => callback(Success(json |> Comment.decodeMany))
         | Error(_error) => callback(Error())
         },
     ()
@@ -88,7 +88,7 @@ let reject = (callback: Callback.t(unit, unit), comment: Comment.t) => {
   );
 };
 
-let rejectAll = (callback: Callback.t(unit, unit), ids: list(int)) => {
+let rejectAll = (callback: Callback.t(unit, unit), ids: list(Model.id)) => {
   Api.request(
     ~method=Fetch.Post,
     ~path="/rejections",

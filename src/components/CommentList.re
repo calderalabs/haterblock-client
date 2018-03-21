@@ -4,7 +4,7 @@ open Belt;
 
 type state = {
   comments: list(CommentData.Comment.t),
-  markedForRejection: list(int)
+  markedForRejection: list(Model.id)
 };
 
 type action =
@@ -44,7 +44,7 @@ let make = (~comments: list(CommentData.Comment.t), _children) => {
     );
   };
   let isMarkedForRejection =
-      (markedForRejection: list(int), comment: CommentData.Comment.t) =>
+      (markedForRejection: list(Model.id), comment: CommentData.Comment.t) =>
     markedForRejection |> List.has(_, comment.id, (==));
   {
     ...component,
