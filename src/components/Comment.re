@@ -16,13 +16,14 @@ let make =
     (
       ~comment: CommentData.Comment.t,
       ~onReject: Callback.action(unit, unit),
-      _children
+      children
     ) => {
   let sentiment = sentimentToEmoji(CommentData.Sentiment.sentiment(comment));
   {
     ...component,
     render: _self =>
       <div className="Comment">
+        (ReasonReact.createDomElement("div", ~props={"className": "Comment__bulkActions"}, children))
         <div className="Comment__sentiment">
           (ReasonReact.stringToElement(sentiment))
         </div>

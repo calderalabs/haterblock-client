@@ -1,0 +1,7 @@
+.Comment {
+  display: grid;
+  grid-template-columns: 100px 100px auto 100px;
+  grid-gap: 10px;
+  border-bottom: 1px solid #ddd;
+  padding: 10px;
+}
