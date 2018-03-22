@@ -19,13 +19,13 @@ let make = (~onClick: Callback.action(unit, unit), children) => {
     ...component,
     initialState: () => {loading: false},
     reducer: (action, _state) =>
-      switch action {
+      switch (action) {
       | Loading => ReasonReact.Update({loading: true})
       | Loaded => ReasonReact.Update({loading: false})
       },
     render: ({ReasonReact.handle, state}) =>
       <LaddaButton onClick=(handle(onLaddaClick)) loading=state.loading>
         children
-      </LaddaButton>
+      </LaddaButton>,
   };
 };

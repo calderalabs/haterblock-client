@@ -3,7 +3,7 @@ open Belt;
 type response = {
   .
   "code": string,
-  [@bs.return nullable] "error": option(string)
+  [@bs.return nullable] "error": option(string),
 };
 
 type gapi = {
@@ -18,12 +18,12 @@ type gapi = {
           .
           "client_id": string,
           "scope": string,
-          "response_type": string
+          "response_type": string,
         },
         response => unit
       ) =>
-      unit
-  }
+      unit,
+  },
 };
 
 [@bs.val] external gapi : gapi = "gapi";
@@ -36,7 +36,7 @@ let authorize =
       ~clientId: string,
       ~scope: string,
       ~responseType: string,
-      ~callback: response => unit
+      ~callback: response => unit,
     ) =>
   gapi##auth2##authorize(
     {"client_id": clientId, "scope": scope, "response_type": responseType},

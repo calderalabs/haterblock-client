@@ -22,7 +22,7 @@ let login = (callback: Callback.t(unit, unit)) =>
     ~scope="profile email https://www.googleapis.com/auth/youtube.force-ssl",
     ~responseType="code",
     ~callback=response =>
-    switch response##error {
+    switch (response##error) {
     | Some(_error) => callback(Error())
     | None =>
       Api.request(
@@ -31,11 +31,11 @@ let login = (callback: Callback.t(unit, unit)) =>
         ~body=[("code", Json.Encode.string(response##code))],
         ~callback=
           response =>
-            switch response {
+            switch (response) {
             | Success(json) => json |> persistToken(callback)
             | Error(_error) => callback(Error())
             },
-        ()
+        (),
       )
     }
   );

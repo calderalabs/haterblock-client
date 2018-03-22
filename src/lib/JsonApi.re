@@ -5,11 +5,11 @@ open Json.Decode;
 module Resource = {
   type t('a) = {
     id: Model.id,
-    attributes: option('a)
+    attributes: option('a),
   };
   let decode = (decoder: Json.Decode.decoder('a), json: Js.Json.t) : t('a) => {
     id: json |> field("id", int),
-    attributes: json |> optional(field("attributes", decoder))
+    attributes: json |> optional(field("attributes", decoder)),
   };
 };
 
@@ -19,12 +19,12 @@ module Document = {
   let decodeOne =
       (resourceDecoder: Js.Json.t => Resource.t('a), json: Js.Json.t)
       : one('a) => {
-    data: json |> field("data", resourceDecoder)
+    data: json |> field("data", resourceDecoder),
   };
   let decodeMany =
       (resourceDecoder: Js.Json.t => Resource.t('a), json: Js.Json.t)
       : many('a) => {
-    data: json |> field("data", list(resourceDecoder))
+    data: json |> field("data", list(resourceDecoder)),
   };
 };
 
@@ -46,11 +46,9 @@ module MakeDecoder =
        : (Decoder with type t := Decodable.t) => {
   type t = Decodable.t;
   let resourceDecoder = Resource.decode(Decodable.attributesDecoder);
-
   let decodeOne = (json: Js.Json.t) : t =>
     Document.decodeOne(resourceDecoder, json).data
     |> Decodable.resourceToRecord;
-
   let decodeMany = (json: Js.Json.t) : list(t) =>
     Document.decodeMany(resourceDecoder, json).data
     |> List.map(_, Decodable.resourceToRecord);

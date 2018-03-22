@@ -4,7 +4,7 @@ open Belt;
 
 type state = {
   loadingMessage: option(string),
-  currentUser: option(UserData.User.t)
+  currentUser: option(UserData.User.t),
 };
 
 type action =
@@ -24,12 +24,12 @@ let make = _children => {
           send(Loaded);
         }
       )
-      |> Callback.ignoreError
+      |> Callback.ignoreError,
     );
   let login = ({ReasonReact.send}) => {
     send(Loading("Logging in..."));
     Session.login(response =>
-      switch response {
+      switch (response) {
       | Success () => fetchCurrentUser(send)
       | Error(_error) => send(Loaded)
       }
@@ -37,14 +37,17 @@ let make = _children => {
   };
   {
     ...component,
-    initialState: () => {loadingMessage: Some("Loading..."), currentUser: None},
+    initialState: () => {
+      loadingMessage: Some("Loading..."),
+      currentUser: None,
+    },
     didMount: ({ReasonReact.send}) => {
       fetchCurrentUser(send);
       Gapi.load(~libs="auth2:client", ~callback=() => send(Loaded));
       ReasonReact.NoUpdate;
     },
     reducer: (action, state) =>
-      switch action {
+      switch (action) {
       | Loading(message) =>
         ReasonReact.Update({...state, loadingMessage: Some(message)})
       | Loaded => ReasonReact.Update({...state, loadingMessage: None})
@@ -65,6 +68,6 @@ let make = _children => {
           | (None, Some(user)) => <Dashboard user />
           }
         )
-      </div>
+      </div>,
   };
 };

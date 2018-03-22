@@ -5,7 +5,7 @@ open Belt;
 let component = ReasonReact.statelessComponent("Comment");
 
 let sentimentToEmoji = (sentiment: CommentData.Sentiment.t) =>
-  switch sentiment {
+  switch (sentiment) {
   | Hateful => {js|😡|js}
   | Negative => {js|😠|js}
   | Neutral => {js|😐|js}
@@ -16,14 +16,20 @@ let make =
     (
       ~comment: CommentData.Comment.t,
       ~onReject: Callback.action(unit, unit),
-      children
+      children,
     ) => {
   let sentiment = sentimentToEmoji(CommentData.Sentiment.sentiment(comment));
   {
     ...component,
     render: _self =>
       <div className="Comment">
-        (ReasonReact.createDomElement("div", ~props={"className": "Comment__bulkActions"}, children))
+        (
+          ReasonReact.createDomElement(
+            "div",
+            ~props={"className": "Comment__bulkActions"},
+            children,
+          )
+        )
         <div className="Comment__sentiment">
           (ReasonReact.stringToElement(sentiment))
         </div>
@@ -39,6 +45,6 @@ let make =
               </AsyncButton>
           )
         </div>
-      </div>
+      </div>,
   };
 };
