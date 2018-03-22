@@ -36,8 +36,11 @@ module Comment = {
       }
     );
 
-  let forIds = (comments: list(t), ids: list(Model.id)) =>
-    comments |> List.keep(_, (comment) => ids |> List.has(_, comment.id, (==)));
+  include Model.Make({
+    type nonrec t = t;
+
+    let toModel = (record: t) : Model.t => { id: record.id };
+  });
 };
 
 module Sentiment = {
