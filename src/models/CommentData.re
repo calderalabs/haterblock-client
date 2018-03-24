@@ -5,30 +5,27 @@ module Comment = {
     id: Model.id,
     body: string,
     score: int,
-    videoId: int,
     rejected: bool,
   };
   include
     JsonApi.MakeDecoder(
       {
         type nonrec t = t;
-        type attributes = {body: string};
+        type attributes = {body: string, score: int};
         let attributesDecoder = (json: Js.Json.t) : attributes =>
-          Json.Decode.{body: json |> field("body", string)};
+          Json.Decode.{body: json |> field("body", string), score: json |> field("score", int)};
         let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : t =>
           switch (resource.attributes) {
           | None => {
               id: resource.id,
               body: "",
               score: 0,
-              videoId: 0,
               rejected: false,
             }
           | Some(attributes) => {
               id: resource.id,
               body: attributes.body,
               score: 0,
-              videoId: 0,
               rejected: false,
             }
           };

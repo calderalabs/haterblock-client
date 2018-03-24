@@ -13,7 +13,6 @@ describe("CommentData.Sentiment.filterBySentiment", () => {
       id: 7,
       body: "This is really good",
       score: 5,
-      videoId: 0,
       rejected: false,
     },
   ];
@@ -22,7 +21,6 @@ describe("CommentData.Sentiment.filterBySentiment", () => {
       id: 2,
       body: "This is not so great but ok",
       score: (-3),
-      videoId: 0,
       rejected: false,
     },
   ];
@@ -31,14 +29,12 @@ describe("CommentData.Sentiment.filterBySentiment", () => {
       id: 1,
       body: "I don't like this",
       score: (-6),
-      videoId: 0,
       rejected: false,
     },
     {
       id: 3,
       body: "Awful content mate",
       score: (-5),
-      videoId: 0,
       rejected: false,
     },
   ];
@@ -47,21 +43,18 @@ describe("CommentData.Sentiment.filterBySentiment", () => {
       id: 6,
       body: "This is total garbage",
       score: (-9),
-      videoId: 0,
       rejected: false,
     },
     {
       id: 4,
       body: "This is fucking shit",
       score: (-8),
-      videoId: 0,
       rejected: false,
     },
     {
       id: 5,
       body: "You should kill yourself",
       score: (-7),
-      videoId: 0,
       rejected: false,
     },
   ];
