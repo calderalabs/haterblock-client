@@ -26,7 +26,7 @@ module Comment = {
           | Some(attributes) => {
               id: resource.id,
               body: attributes.body,
-              score: 0,
+              score: attributes.score,
               rejected: false,
             }
           };
