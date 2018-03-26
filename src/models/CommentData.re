@@ -11,17 +11,18 @@ module Comment = {
     JsonApi.MakeDecoder(
       {
         type nonrec t = t;
-        type attributes = {body: string, score: int};
+        type attributes = {
+          body: string,
+          score: int,
+        };
         let attributesDecoder = (json: Js.Json.t) : attributes =>
-          Json.Decode.{body: json |> field("body", string), score: json |> field("score", int)};
+          Json.Decode.{
+            body: json |> field("body", string),
+            score: json |> field("score", int),
+          };
         let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : t =>
           switch (resource.attributes) {
-          | None => {
-              id: resource.id,
-              body: "",
-              score: 0,
-              rejected: false,
-            }
+          | None => {id: resource.id, body: "", score: 0, rejected: false}
           | Some(attributes) => {
               id: resource.id,
               body: attributes.body,

@@ -13,7 +13,7 @@ let make = (~user: UserData.User.t, _children) => {
   let loadComments = ({ReasonReact.send}) =>
     CommentData.fetchAll(response =>
       switch (response) {
-      | Success (comments) => { Js.log(List.map(comments, (c) => c.body)); send(CommentsLoaded(comments)) }
+      | Success(comments) => send(CommentsLoaded(comments))
       | Error () => ()
       }
     );

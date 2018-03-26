@@ -16,12 +16,7 @@ let persistToken = (callback: Callback.t(unit, unit), json: Js.Json.t) =>
   );
 
 let login = (callback: Callback.t(unit, unit)) =>
-  Gapi.authorize(
-    ~clientId=
-      "1008243769527-gv6uq08kuatnu5gcdvd5bggtkpc5mc0k.apps.googleusercontent.com",
-    ~scope="profile email https://www.googleapis.com/auth/youtube.force-ssl",
-    ~responseType="code",
-    ~callback=response =>
+  Gapi.grantOfflineAccess(response =>
     switch (response##error) {
     | Some(_error) => callback(Error())
     | None =>
