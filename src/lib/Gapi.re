@@ -1,5 +1,7 @@
 open Belt;
 
+let auth2 = ref(None);
+
 type response = {
   .
   "code": string,
@@ -12,17 +14,18 @@ type gapi = {
   "auth2": {
     .
     [@bs.meth]
-    "authorize":
-      (
-        {
-          .
-          "client_id": string,
-          "scope": string,
-          "response_type": string,
-        },
-        response => unit
-      ) =>
-      unit,
+    "init":
+      {
+        .
+        "client_id": string,
+        "scope": string,
+      } =>
+      {
+        .
+        [@bs.meth]
+        "grantOfflineAccess":
+          unit => {. [@bs.meth] "_then": (response => unit) => unit},
+      },
   },
 };
 
@@ -31,15 +34,12 @@ type gapi = {
 let load = (~libs: string, ~callback: unit => unit) =>
   gapi##load(libs, callback);
 
-let authorize =
-    (
-      ~clientId: string,
-      ~scope: string,
-      ~responseType: string,
-      ~callback: response => unit,
-    ) =>
-  gapi##auth2##authorize(
-    {"client_id": clientId, "scope": scope, "response_type": responseType},
-    response =>
-    callback(response)
-  );
+let init = (~clientId: string, ~scope: string) =>
+  auth2 := Some(gapi##auth2##init({"client_id": clientId, "scope": scope}));
+
+let grantOfflineAccess = (callback: response => unit) =>
+  switch (auth2^) {
+  | Some(auth2) =>
+    auth2##grantOfflineAccess()##_then(response => callback(response))
+  | None => ()
+  };
