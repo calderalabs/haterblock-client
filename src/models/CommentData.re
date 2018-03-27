@@ -7,7 +7,7 @@ module Status = {
     | HeldForReview
     | Rejected
     | LikelySpam;
-  let fromString = (status: string) =>
+  let decode = (status: string) =>
     switch (status) {
     | "published" => Published
     | "heldForReview" => HeldForReview
@@ -17,11 +17,35 @@ module Status = {
     };
 };
 
+module Sentiment = {
+  type t =
+    | Hateful
+    | Negative
+    | Neutral
+    | Positive;
+  exception InvalidSentiment;
+  let decode = (sentiment: string) =>
+    switch (sentiment) {
+    | "positive" => Positive
+    | "neutral" => Neutral
+    | "negative" => Negative
+    | "hateful" => Hateful
+    | _ => raise(InvalidSentiment)
+    };
+  let encode = (sentiment: t) =>
+    switch sentiment {
+    | Positive => "positive"
+    | Neutral => "neutral"
+    | Negative => "negative"
+    | Hateful => "hateful"
+    };
+};
+
 module Comment = {
   type t = {
     id: Model.id,
     body: string,
-    score: int,
+    sentiment: Sentiment.t,
     status: Status.t,
   };
   include
@@ -30,23 +54,23 @@ module Comment = {
         type nonrec t = t;
         type attributes = {
           body: string,
-          score: int,
+          sentiment: string,
           status: string
         };
         let attributesDecoder = (json: Js.Json.t) : attributes =>
           Json.Decode.{
             body: json |> field("body", string),
-            score: json |> field("score", int),
+            sentiment: json |> field("sentiment", string),
             status: json |> field("status", string)
           };
         let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : t =>
           switch (resource.attributes) {
-          | None => {id: resource.id, body: "", score: 0, status: Published}
+          | None => {id: resource.id, body: "", sentiment: Neutral, status: Published}
           | Some(attributes) => {
               id: resource.id,
               body: attributes.body,
-              score: attributes.score,
-              status: Status.fromString(attributes.status),
+              sentiment: Sentiment.decode(attributes.sentiment),
+              status: Status.decode(attributes.status),
             }
           };
       },
@@ -60,30 +84,16 @@ module Comment = {
     );
 };
 
-module Sentiment = {
-  type t =
-    | Hateful
-    | Negative
-    | Neutral
-    | Positive;
-  exception InvalidSentiment;
-  let sentimentMap = score =>
-    switch (score) {
-    | x when x >= 5 && x <= 10 => Positive
-    | x when x >= (-3) && x <= 4 => Neutral
-    | x when x >= (-6) && x <= (-4) => Negative
-    | x when x >= (-10) && x <= (-7) => Hateful
-    | _ => raise(InvalidSentiment)
-    };
-  let sentiment = (comment: Comment.t) => sentimentMap(comment.score);
-  let filterBySentiment = (comments: list(Comment.t), filter: t) =>
-    comments |> List.keep(_, comment => sentiment(comment) == filter);
-};
-
-let fetchAll = (callback: Callback.t(list(Comment.t), unit)) =>
+let fetchAll = (~sentiment: option(Sentiment.t)=?, callback: Callback.t(list(Comment.t), unit)) => {
+  let path = switch sentiment {
+  | None => "/comments"
+  | Some(sentiment) =>
+    let encodedSentiment = Sentiment.encode(sentiment);
+    {j|/comments?sentiment=$(encodedSentiment)|j};
+  };
   Api.request(
     ~method=Fetch.Get,
-    ~path="/comments",
+    ~path=path,
     ~callback=
       response =>
         switch (response) {
@@ -92,6 +102,7 @@ let fetchAll = (callback: Callback.t(list(Comment.t), unit)) =>
         },
     (),
   );
+};
 
 let rejectAll = (callback: Callback.t(unit, unit), ids: list(Model.id)) =>
   Api.request(
