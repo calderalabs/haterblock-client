@@ -57,8 +57,8 @@ let make = (~comments: list(CommentData.Comment.t), _children) => {
       | Reject(rejectedComments, callback) =>
         let updateComment = comment =>
           isMarkedForRejection(state.markedForRejection, comment) ?
-            {...comment, rejected: true} : comment;
-        let updatedComments = state.comments |> List.map(_, updateComment);
+            {...comment, status: Rejected} : comment;
+        let updatedComments = rejectedComments |> List.map(_, updateComment);
         ReasonReact.UpdateWithSideEffects(
           {...state, comments: updatedComments},
           (_self => callback()),

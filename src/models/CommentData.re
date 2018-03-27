@@ -1,11 +1,28 @@
 open Belt;
 
+module Status = {
+  exception InvalidStatus;
+  type t =
+    | Published
+    | HeldForReview
+    | Rejected
+    | LikelySpam;
+  let fromString = (status: string) =>
+    switch (status) {
+    | "published" => Published
+    | "heldForReview" => HeldForReview
+    | "rejected" => Rejected
+    | "likelySpam" => LikelySpam
+    | _ => raise(InvalidStatus)
+    };
+};
+
 module Comment = {
   type t = {
     id: Model.id,
     body: string,
     score: int,
-    rejected: bool,
+    status: Status.t,
   };
   include
     JsonApi.MakeDecoder(
@@ -14,20 +31,22 @@ module Comment = {
         type attributes = {
           body: string,
           score: int,
+          status: string
         };
         let attributesDecoder = (json: Js.Json.t) : attributes =>
           Json.Decode.{
             body: json |> field("body", string),
             score: json |> field("score", int),
+            status: json |> field("status", string)
           };
         let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : t =>
           switch (resource.attributes) {
-          | None => {id: resource.id, body: "", score: 0, rejected: false}
+          | None => {id: resource.id, body: "", score: 0, status: Published}
           | Some(attributes) => {
               id: resource.id,
               body: attributes.body,
               score: attributes.score,
-              rejected: false,
+              status: Status.fromString(attributes.status),
             }
           };
       },
@@ -74,26 +93,11 @@ let fetchAll = (callback: Callback.t(list(Comment.t), unit)) =>
     (),
   );
 
-let reject = (callback: Callback.t(unit, unit), comment: Comment.t) => {
-  let id = comment.id;
-  Api.request(
-    ~method=Fetch.Put,
-    ~path={j|/rejections/$id|j},
-    ~callback=
-      response =>
-        switch (response) {
-        | Success(_json) => callback(Success())
-        | Error(_error) => callback(Error())
-        },
-    (),
-  );
-};
-
 let rejectAll = (callback: Callback.t(unit, unit), ids: list(Model.id)) =>
   Api.request(
     ~method=Fetch.Post,
     ~path="/rejections",
-    ~body=[Json.Encode.("ids", list(int, ids))],
+    ~body=[Json.Encode.("rejection", object_([("ids", list(int, ids))]))],
     ~callback=
       response =>
         switch (response) {
@@ -102,3 +106,6 @@ let rejectAll = (callback: Callback.t(unit, unit), ids: list(Model.id)) =>
         },
     (),
   );
+
+let reject = (callback: Callback.t(unit, unit), comment: Comment.t) =>
+  rejectAll(callback, [comment.id]);

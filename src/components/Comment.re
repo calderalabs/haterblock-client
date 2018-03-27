@@ -38,7 +38,7 @@ let make =
         </div>
         <div className="Comment__actions">
           (
-            comment.rejected ?
+            comment.status == Rejected ?
               ReasonReact.stringToElement("Rejected") :
               <AsyncButton onClick=onReject>
                 (ReasonReact.stringToElement("Reject"))

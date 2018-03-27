@@ -9,24 +9,24 @@ open CommentData.Comment;
 describe("CommentData.Sentiment.filterBySentiment", () => {
   open Expect;
   let positiveComments = [
-    {id: 7, body: "This is really good", score: 5, rejected: false},
+    {id: 7, body: "This is really good", score: 5, status: Published},
   ];
   let neutralComments = [
     {
       id: 2,
       body: "This is not so great but ok",
       score: (-3),
-      rejected: false,
+      status: Published,
     },
   ];
   let negativeComments = [
-    {id: 1, body: "I don't like this", score: (-6), rejected: false},
-    {id: 3, body: "Awful content mate", score: (-5), rejected: false},
+    {id: 1, body: "I don't like this", score: (-6), status: Published},
+    {id: 3, body: "Awful content mate", score: (-5), status: Published},
   ];
   let hatefulComments = [
-    {id: 6, body: "This is total garbage", score: (-9), rejected: false},
-    {id: 4, body: "This is fucking shit", score: (-8), rejected: false},
-    {id: 5, body: "You should kill yourself", score: (-7), rejected: false},
+    {id: 6, body: "This is total garbage", score: (-9), status: Published},
+    {id: 4, body: "This is fucking shit", score: (-8), status: Published},
+    {id: 5, body: "You should kill yourself", score: (-7), status: Published},
   ];
   let comments =
     List.concatMany([|
