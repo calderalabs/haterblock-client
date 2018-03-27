@@ -18,7 +18,7 @@ let make =
       ~onReject: Callback.action(unit, unit),
       children,
     ) => {
-  let sentiment = sentimentToEmoji(CommentData.Sentiment.sentiment(comment));
+  let sentiment = sentimentToEmoji(comment.sentiment);
   {
     ...component,
     render: _self =>

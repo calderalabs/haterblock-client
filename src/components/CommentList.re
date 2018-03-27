@@ -3,17 +3,18 @@ open Belt;
 [%bs.raw {|require('./CommentList.css')|}];
 
 type state = {
-  comments: list(CommentData.Comment.t),
+  comments: option(list(CommentData.Comment.t)),
   markedForRejection: list(Model.id),
 };
 
 type action =
   | Reject(list(CommentData.Comment.t), unit => unit)
-  | ToggleForRejection(CommentData.Comment.t);
+  | ToggleForRejection(CommentData.Comment.t)
+  | CommentsLoaded(list(CommentData.Comment.t));
 
 let component = ReasonReact.reducerComponent("CommentList");
 
-let make = (~comments: list(CommentData.Comment.t), _children) => {
+let make = (~sentiment: CommentData.Sentiment.t, _children) => {
   let reject =
       (
         comment: CommentData.Comment.t,
@@ -27,31 +28,38 @@ let make = (~comments: list(CommentData.Comment.t), _children) => {
          | Error () => callback(response)
          }
        );
-  let rejectMarked = (self, callback: Callback.t(unit, unit)) => {
-    let markedForRejection = self.ReasonReact.state.markedForRejection;
-    markedForRejection
-    |> CommentData.rejectAll(response =>
-         switch (response) {
-         | Success () =>
-           self.send(
-             Reject(
-               CommentData.Comment.forIds(
-                 self.state.comments,
-                 markedForRejection,
+  let rejectMarked = (self, callback: Callback.t(unit, unit)) =>
+    switch (self.ReasonReact.state.comments) {
+    | None => ()
+    | Some(comments) =>
+      let markedForRejection = self.ReasonReact.state.markedForRejection;
+      markedForRejection
+      |> CommentData.rejectAll(response =>
+           switch (response) {
+           | Success () =>
+             self.send(
+               Reject(
+                 CommentData.Comment.forIds(comments, markedForRejection),
+                 () => callback(response),
                ),
-               () => callback(response),
-             ),
-           )
-         | Error () => callback(response)
-         }
-       );
-  };
+             )
+           | Error () => callback(response)
+           }
+         );
+    };
   let isMarkedForRejection =
       (markedForRejection: list(Model.id), comment: CommentData.Comment.t) =>
     markedForRejection |> List.has(_, comment.id, (==));
+  let loadComments = ({ReasonReact.send}) =>
+    CommentData.fetchAll(~sentiment, response =>
+      switch (response) {
+      | Success(comments) => send(CommentsLoaded(comments))
+      | Error () => ()
+      }
+    );
   {
     ...component,
-    initialState: () => {comments, markedForRejection: []},
+    initialState: () => {comments: None, markedForRejection: []},
     reducer: (action, state) =>
       switch (action) {
       | Reject(rejectedComments, callback) =>
@@ -60,7 +68,7 @@ let make = (~comments: list(CommentData.Comment.t), _children) => {
             {...comment, status: Rejected} : comment;
         let updatedComments = rejectedComments |> List.map(_, updateComment);
         ReasonReact.UpdateWithSideEffects(
-          {...state, comments: updatedComments},
+          {...state, comments: Some(updatedComments)},
           (_self => callback()),
         );
       | ToggleForRejection(comment) =>
@@ -69,7 +77,13 @@ let make = (~comments: list(CommentData.Comment.t), _children) => {
             state.markedForRejection |> List.keep(_, id => comment.id != id) :
             [comment.id, ...state.markedForRejection];
         ReasonReact.Update({...state, markedForRejection});
+      | CommentsLoaded(comments) =>
+        ReasonReact.Update({...state, comments: Some(comments)})
       },
+    didMount: self => {
+      loadComments(self);
+      ReasonReact.NoUpdate;
+    },
     render: self =>
       <div className="CommentList">
         <div className="CommentList__header">
@@ -81,32 +95,39 @@ let make = (~comments: list(CommentData.Comment.t), _children) => {
         </div>
         <div className="CommentList__comments">
           (
-            self.state.comments
-            |> List.map(_, comment =>
-                 CommentData.Comment.(
-                   <div key=(string_of_int(comment.id))>
-                     <Comment comment onReject=(reject(comment, self))>
-                       <input
-                         name="markedForRejection"
-                         _type="checkbox"
-                         checked=(
-                           Js.Boolean.to_js_boolean(
-                             isMarkedForRejection(
-                               self.state.markedForRejection,
-                               comment,
-                             ),
-                           )
-                         )
-                         onChange=(
-                           _event => self.send(ToggleForRejection(comment))
-                         )
-                       />
-                     </Comment>
-                   </div>
-                 )
-               )
-            |> List.toArray
-            |> ReasonReact.arrayToElement
+            switch (self.state.comments) {
+              | None =>
+                ReasonReact.stringToElement("Loading")
+              | Some([]) =>
+                ReasonReact.stringToElement("There are no comments to display")
+              | Some(comments) =>
+                comments
+                |> List.map(_, comment =>
+                    CommentData.Comment.(
+                      <div key=(string_of_int(comment.id))>
+                        <Comment comment onReject=(reject(comment, self))>
+                          <input
+                            name="markedForRejection"
+                            _type="checkbox"
+                            checked=(
+                              Js.Boolean.to_js_boolean(
+                                isMarkedForRejection(
+                                  self.state.markedForRejection,
+                                  comment,
+                                ),
+                              )
+                            )
+                            onChange=(
+                              _event => self.send(ToggleForRejection(comment))
+                            )
+                          />
+                        </Comment>
+                      </div>
+                    )
+                  )
+                |> List.toArray
+                |> ReasonReact.arrayToElement
+            }
           )
         </div>
       </div>,

@@ -73,7 +73,7 @@ let make = _children => {
             <button onClick=(_event => send(Login))>
               (ReasonReact.stringToElement("Login"))
             </button>
-          | (None, Some(user)) => <Dashboard user />
+          | (None, Some(_)) => <Dashboard />
           }
         )
       </div>,
