@@ -10,7 +10,8 @@
     "reason-react",
     "@glennsl/bs-jest",
     "bs-fetch",
-    "@glennsl/bs-json"
+    "@glennsl/bs-json",
+    "bs-moment"
   ],
   "reason": {
     "react-jsx": 2
