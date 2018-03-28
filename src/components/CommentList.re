@@ -71,14 +71,18 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
     reducer: (action, state) =>
       switch (action) {
       | Reject(rejectedComments, callback) =>
-        let updateComment = comment =>
-          isMarkedForRejection(state.markedForRejection, comment) ?
-            {...comment, status: Rejected} : comment;
-        let updatedComments = rejectedComments |> List.map(_, updateComment);
-        ReasonReact.UpdateWithSideEffects(
-          {...state, comments: Some(updatedComments)},
-          (_self => callback()),
-        );
+        switch (state.comments) {
+        | Some(comments) =>
+          let updateComment = comment =>
+            rejectedComments |> List.has(_, comment, (==)) ?
+              {...comment, status: Rejected} : comment;
+          let updatedComments = comments |> List.map(_, updateComment);
+          ReasonReact.UpdateWithSideEffects(
+            {...state, comments: Some(updatedComments)},
+            (_self => callback()),
+          );
+        | None => ReasonReact.NoUpdate
+        }
       | ToggleForRejection(comment) =>
         let markedForRejection =
           isMarkedForRejection(state.markedForRejection, comment) ?
