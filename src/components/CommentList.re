@@ -4,13 +4,15 @@ open Belt;
 
 type state = {
   comments: option(list(CommentData.Comment.t)),
+  totalPages: int,
+  totalEntries: int,
   markedForRejection: list(Model.id),
 };
 
 type action =
   | Reject(list(CommentData.Comment.t), unit => unit)
   | ToggleForRejection(CommentData.Comment.t)
-  | CommentsLoaded(list(CommentData.Comment.t));
+  | CommentsLoaded(JsonApi.Document.decodedMany(CommentData.Comment.t));
 
 let component = ReasonReact.reducerComponent("CommentList");
 
@@ -30,7 +32,8 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
        );
   let rejectMarked = (self, callback: Callback.t(unit, unit)) =>
     switch (self.ReasonReact.state.comments) {
-    | None => ()
+    | None
+    | Some([]) => callback(Success())
     | Some(comments) =>
       let markedForRejection = self.ReasonReact.state.markedForRejection;
       markedForRejection
@@ -50,16 +53,21 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
   let isMarkedForRejection =
       (markedForRejection: list(Model.id), comment: CommentData.Comment.t) =>
     markedForRejection |> List.has(_, comment.id, (==));
-  let loadComments = ({ReasonReact.send}) =>
-    CommentData.fetchAll(~sentiment, response =>
+  let loadComments = (~page=1, {ReasonReact.send}) =>
+    CommentData.fetchAll(~sentiment, ~page, response =>
       switch (response) {
-      | Success(comments) => send(CommentsLoaded(comments))
+      | Success(document) => send(CommentsLoaded(document))
       | Error () => ()
       }
     );
   {
     ...component,
-    initialState: () => {comments: None, markedForRejection: []},
+    initialState: () => {
+      comments: None,
+      markedForRejection: [],
+      totalPages: 0,
+      totalEntries: 0,
+    },
     reducer: (action, state) =>
       switch (action) {
       | Reject(rejectedComments, callback) =>
@@ -77,14 +85,25 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
             state.markedForRejection |> List.keep(_, id => comment.id != id) :
             [comment.id, ...state.markedForRejection];
         ReasonReact.Update({...state, markedForRejection});
-      | CommentsLoaded(comments) =>
-        ReasonReact.Update({...state, comments: Some(comments)})
+      | CommentsLoaded(document) =>
+        ReasonReact.Update({
+          ...state,
+          comments: Some(document.resources),
+          totalPages: document.meta.totalPages,
+          totalEntries: document.meta.totalEntries,
+        })
       },
     didMount: self => {
       loadComments(self);
       ReasonReact.NoUpdate;
     },
-    render: self =>
+    render: self => {
+      let totalEntries = self.state.totalEntries;
+      let count =
+        switch (self.state.comments) {
+        | None => 0
+        | Some(comments) => comments |> List.length
+        };
       <div className="CommentList">
         <div className="CommentList__header">
           <div>
@@ -92,44 +111,61 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
               (ReasonReact.stringToElement("Reject Marked"))
             </AsyncButton>
           </div>
+          <div>
+            (
+              ReasonReact.stringToElement(
+                {j|Showing $(count) of $(totalEntries)|j},
+              )
+            )
+          </div>
         </div>
         <div className="CommentList__comments">
           (
             switch (self.state.comments) {
-              | None =>
-                ReasonReact.stringToElement("Loading")
-              | Some([]) =>
-                ReasonReact.stringToElement("There are no comments to display")
-              | Some(comments) =>
-                comments
-                |> List.map(_, comment =>
-                    CommentData.Comment.(
-                      <div key=(string_of_int(comment.id))>
-                        <Comment comment onReject=(reject(comment, self))>
-                          <input
-                            name="markedForRejection"
-                            _type="checkbox"
-                            checked=(
-                              Js.Boolean.to_js_boolean(
-                                isMarkedForRejection(
-                                  self.state.markedForRejection,
-                                  comment,
-                                ),
-                              )
-                            )
-                            onChange=(
-                              _event => self.send(ToggleForRejection(comment))
-                            )
-                          />
-                        </Comment>
-                      </div>
-                    )
-                  )
-                |> List.toArray
-                |> ReasonReact.arrayToElement
+            | None => ReasonReact.stringToElement("Loading")
+            | Some([]) =>
+              ReasonReact.stringToElement("There are no comments to display")
+            | Some(comments) =>
+              comments
+              |> List.map(_, comment =>
+                   CommentData.Comment.(
+                     <div key=(string_of_int(comment.id))>
+                       <Comment comment onReject=(reject(comment, self))>
+                         <input
+                           name="markedForRejection"
+                           _type="checkbox"
+                           checked=(
+                             Js.Boolean.to_js_boolean(
+                               isMarkedForRejection(
+                                 self.state.markedForRejection,
+                                 comment,
+                               ),
+                             )
+                           )
+                           onChange=(
+                             _event => self.send(ToggleForRejection(comment))
+                           )
+                         />
+                       </Comment>
+                     </div>
+                   )
+                 )
+              |> List.toArray
+              |> ReasonReact.arrayToElement
             }
           )
         </div>
-      </div>,
+        <div className="CommentList__footer">
+          <ReactPaginate
+            pageCount=self.state.totalPages
+            pageRangeDisplayed=4
+            marginPagesDisplayed=1
+            onPageChange=(
+              data => loadComments(self, ~page=data##selected + 1)
+            )
+          />
+        </div>
+      </div>;
+    },
   };
 };

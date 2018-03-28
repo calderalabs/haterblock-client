@@ -32,6 +32,7 @@ let request =
       ~path: string,
       ~callback: option(Callback.t(Js.Json.t, string))=?,
       ~body: option(list((string, Js.Json.t)))=?,
+      ~query: option(list((string, string)))=?,
       (),
     ) => {
   let initBody =
@@ -40,9 +41,19 @@ let request =
       Some(Fetch.BodyInit.make(Json.stringify(Json.Encode.object_(body))))
     | None => None
     };
+
+  let fullPath = switch (query) {
+  | Some(query) => {
+    let queryString = query
+      |> List.map(_, ((key, value)) => {j|$(key)=$(value)|j})
+      |> List.reduce(_, "", (acc, param) => {j|$(acc)&$(param)|j});
+    {j|$(path)?$(queryString)|j};
+  }
+  | None => path
+  };
   Js.Promise.(
     Fetch.fetchWithInit(
-      {j|$(baseUrl)$(path)|j},
+      {j|$(baseUrl)$(fullPath)|j},
       Fetch.RequestInit.make(
         ~method_=method,
         ~headers=Fetch.HeadersInit.makeWithArray(requestHeaders()),
@@ -78,6 +89,5 @@ let request =
          Js.log(error);
          resolve();
        })
-  )
-  |> ignore;
+  ) |> ignore;
 };

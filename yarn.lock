@@ -5872,7 +5872,7 @@ promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
-prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0:
+prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1:
   version "15.6.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.1.tgz#36644453564255ddda391191fb3a125cbdf654ca"
   dependencies:
@@ -6042,6 +6042,12 @@ react-ladda@^6.0.0:
   dependencies:
     ladda "^1.0.0"
     prop-types "^15.5.8"
+
+react-paginate@^5.2.2:
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/react-paginate/-/react-paginate-5.2.2.tgz#c407d325e3073e39e49739ab5095a829000a1c46"
+  dependencies:
+    prop-types "^15.6.1"
 
 "react@>=15.0.0 || >=16.0.0", react@^16.2.0:
   version "16.2.0"

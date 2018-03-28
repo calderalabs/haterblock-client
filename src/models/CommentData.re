@@ -98,19 +98,17 @@ module Comment = {
 
 let fetchAll =
     (
-      ~sentiment: option(Sentiment.t)=?,
-      callback: Callback.t(list(Comment.t), unit),
-    ) => {
-  let path =
-    switch (sentiment) {
-    | None => "/comments"
-    | Some(sentiment) =>
-      let encodedSentiment = Sentiment.encode(sentiment);
-      {j|/comments?sentiment=$(encodedSentiment)|j};
-    };
+      ~sentiment=Sentiment.Positive,
+      ~page=1,
+      callback: Callback.t(JsonApi.Document.decodedMany(Comment.t), unit),
+    ) =>
   Api.request(
     ~method=Fetch.Get,
-    ~path,
+    ~path="/comments",
+    ~query=[
+      ("sentiment", Sentiment.encode(sentiment)),
+      ("page", string_of_int(page)),
+    ],
     ~callback=
       response =>
         switch (response) {
@@ -119,7 +117,6 @@ let fetchAll =
         },
     (),
   );
-};
 
 let rejectAll = (callback: Callback.t(unit, unit), ids: list(Model.id)) =>
   Api.request(

@@ -14,8 +14,23 @@ module Resource = {
 };
 
 module Document = {
+  type meta = {
+    totalPages: int,
+    totalEntries: int,
+  };
   type one('a) = {data: Resource.t('a)};
-  type many('a) = {data: list(Resource.t('a))};
+  type many('a) = {
+    data: list(Resource.t('a)),
+    meta,
+  };
+  type decodedMany('a) = {
+    meta,
+    resources: list('a),
+  };
+  let metaDecoder = (json: Js.Json.t) : meta => {
+    totalPages: json |> field("total_pages", int),
+    totalEntries: json |> field("total_entries", int),
+  };
   let decodeOne =
       (resourceDecoder: Js.Json.t => Resource.t('a), json: Js.Json.t)
       : one('a) => {
@@ -24,6 +39,7 @@ module Document = {
   let decodeMany =
       (resourceDecoder: Js.Json.t => Resource.t('a), json: Js.Json.t)
       : many('a) => {
+    meta: json |> field("meta", metaDecoder),
     data: json |> field("data", list(resourceDecoder)),
   };
 };
@@ -38,7 +54,7 @@ module type Decodable = {
 module type Decoder = {
   type t;
   let decodeOne: Js.Json.t => t;
-  let decodeMany: Js.Json.t => list(t);
+  let decodeMany: Js.Json.t => Document.decodedMany(t);
 };
 
 module MakeDecoder =
@@ -49,7 +65,11 @@ module MakeDecoder =
   let decodeOne = (json: Js.Json.t) : t =>
     Document.decodeOne(resourceDecoder, json).data
     |> Decodable.resourceToRecord;
-  let decodeMany = (json: Js.Json.t) : list(t) =>
-    Document.decodeMany(resourceDecoder, json).data
-    |> List.map(_, Decodable.resourceToRecord);
+  let decodeMany = (json: Js.Json.t) : Document.decodedMany(t) => {
+    let document = Document.decodeMany(resourceDecoder, json);
+    {
+      meta: document.meta,
+      resources: document.data |> List.map(_, Decodable.resourceToRecord),
+    };
+  };
 };
