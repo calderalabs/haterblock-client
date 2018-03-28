@@ -34,7 +34,7 @@ let make =
           (ReasonReact.stringToElement(sentiment))
         </div>
         <div className="Comment__body">
-          (ReasonReact.stringToElement(comment.body))
+          <div dangerouslySetInnerHTML={"__html": comment.body} />
         </div>
         <div className="Comment__actions">
           (
