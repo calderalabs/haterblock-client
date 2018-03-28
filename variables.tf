@@ -1,5 +1,8 @@
+variable "dnsimple_account" {}
+variable "dnsimple_token" {}
+
 variable "domain" {
-  default = "haterblock.io"
+  default = "gethaterblock.com"
 }
 
 variable "bucket" {
