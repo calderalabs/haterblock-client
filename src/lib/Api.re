@@ -7,6 +7,7 @@ exception RequestFailed;
 let baseUrl =
   switch (environment) {
   | "development" => "http://localhost:4000"
+  | "production" => "https://api.gethaterblock.com"
   | _ => "http://localhost:4000"
   };
 
@@ -41,16 +42,16 @@ let request =
       Some(Fetch.BodyInit.make(Json.stringify(Json.Encode.object_(body))))
     | None => None
     };
-
-  let fullPath = switch (query) {
-  | Some(query) => {
-    let queryString = query
-      |> List.map(_, ((key, value)) => {j|$(key)=$(value)|j})
-      |> List.reduce(_, "", (acc, param) => {j|$(acc)&$(param)|j});
-    {j|$(path)?$(queryString)|j};
-  }
-  | None => path
-  };
+  let fullPath =
+    switch (query) {
+    | Some(query) =>
+      let queryString =
+        query
+        |> List.map(_, ((key, value)) => {j|$(key)=$(value)|j})
+        |> List.reduce(_, "", (acc, param) => {j|$(acc)&$(param)|j});
+      {j|$(path)?$(queryString)|j};
+    | None => path
+    };
   Js.Promise.(
     Fetch.fetchWithInit(
       {j|$(baseUrl)$(fullPath)|j},
@@ -89,5 +90,6 @@ let request =
          Js.log(error);
          resolve();
        })
-  ) |> ignore;
+  )
+  |> ignore;
 };
