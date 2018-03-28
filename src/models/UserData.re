@@ -1,16 +1,33 @@
 open Belt;
 
 module User = {
-  type t = {id: Model.id};
+  type t = {
+    id: Model.id,
+    name: string,
+    email: string,
+  };
   include
     JsonApi.MakeDecoder(
       {
         type nonrec t = t;
-        type attributes = option({.});
-        let attributesDecoder = (_json: Js.Json.t) : attributes => None;
-        let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : t => {
-          id: resource.id,
+        type attributes = {
+          name: string,
+          email: string,
         };
+        let attributesDecoder = (json: Js.Json.t) : attributes =>
+          Json.Decode.{
+            name: json |> field("name", string),
+            email: json |> field("email", string),
+          };
+        let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : t =>
+          switch (resource.attributes) {
+          | None => {id: resource.id, name: "", email: ""}
+          | Some(attributes) => {
+              id: resource.id,
+              name: attributes.name,
+              email: attributes.email,
+            }
+          };
       },
     );
 };
