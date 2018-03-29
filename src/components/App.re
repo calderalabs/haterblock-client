@@ -11,21 +11,26 @@ type action =
   | Login
   | UserLoaded(UserData.User.t)
   | Loading(string)
-  | Loaded;
+  | Loaded
+  | Logout;
 
 let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
   let fetchCurrentUser = send =>
-    UserData.fetch(
-      (
-        user => {
-          send(UserLoaded(user));
-          send(Loaded);
-        }
+    switch (Session.getToken()) {
+    | None => send(Loaded)
+    | Some(_) =>
+      UserData.fetch(
+        (
+          user => {
+            send(UserLoaded(user));
+            send(Loaded);
+          }
+        )
+        |> Callback.ignoreError,
       )
-      |> Callback.ignoreError,
-    );
+    };
   let login = ({ReasonReact.send}) => {
     send(Loading("Logging in..."));
     Session.login(response =>
@@ -61,6 +66,11 @@ let make = _children => {
       | Login => ReasonReact.SideEffects((self => login(self)))
       | UserLoaded(user) =>
         ReasonReact.Update({...state, currentUser: Some(user)})
+      | Logout =>
+        ReasonReact.UpdateWithSideEffects(
+          {...state, currentUser: None},
+          ((_) => Session.logout()),
+        )
       },
     render: ({state, send}) =>
       <div className="App">
@@ -72,7 +82,13 @@ let make = _children => {
             <button onClick=(_event => send(Login))>
               (ReasonReact.stringToElement("Login"))
             </button>
-          | (None, Some(user)) => <Dashboard user />
+          | (None, Some(user)) =>
+            <div>
+              <button onClick=(_event => send(Logout))>
+                (ReasonReact.stringToElement("Logout"))
+              </button>
+              <Dashboard user />
+            </div>
           }
         )
       </div>,
