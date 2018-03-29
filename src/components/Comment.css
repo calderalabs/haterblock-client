@@ -3,6 +3,7 @@
   align-items: center;
   border-bottom: 1px solid #EEEDF3;
   padding: 16px 20px;
+  min-height: 30px;
 }
 
 .Comment__body {
