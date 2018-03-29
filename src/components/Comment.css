@@ -7,12 +7,13 @@
 
 .Comment__body {
   flex-grow: 1;
+  padding: 0 20px;
 }
 
 .Comment__bulkActions {
   display: flex;
 }
 
-.Comment__bulkActions, .Comment__sentiment {
+.Comment__bulkActions {
   padding-right: 20px;
 }
