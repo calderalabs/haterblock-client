@@ -40,7 +40,7 @@ let make =
           (
             comment.status == Rejected ?
               ReasonReact.stringToElement("Rejected") :
-              <AsyncButton onClick=onReject>
+              <AsyncButton onClick=onReject className="Button Button--small">
                 (ReasonReact.stringToElement("Reject"))
               </AsyncButton>
           )

@@ -95,7 +95,9 @@ let make = _children => {
                 |]
                 |> ReasonReact.arrayToElement
               | None =>
-                <button onClick=(_event => send(Login))>
+                <button
+                  onClick=(_event => send(Login))
+                  className="Button Button--small">
                   (ReasonReact.stringToElement("Login"))
                 </button>
               }
@@ -105,10 +107,15 @@ let make = _children => {
         <div className="App__content">
           <div className="App__contentInner">
             (
-              switch (state.loadingMessage) {
-              | Some(loadingMessage) =>
-                <span> (ReasonReact.stringToElement(loadingMessage)) </span>
-              | None => <Dashboard />
+              switch (state.currentUser, state.loadingMessage) {
+              | (_, Some(loadingMessage)) =>
+                <div className="App__loadingMessageWrapper">
+                  <div className="App__loadingMessage">
+                    (ReasonReact.stringToElement(loadingMessage))
+                  </div>
+                </div>
+              | (Some(_), None) => <Dashboard />
+              | (None, _) => ReasonReact.nullElement
               }
             )
           </div>

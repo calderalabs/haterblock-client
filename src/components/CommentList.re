@@ -110,6 +110,9 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
             | Some([]) => ReasonReact.nullElement
             | Some(_) =>
               <div className="CommentList__bulkActions">
+                <span
+                  className="fa fa-arrow-down CommentList__bulkActionsIcon"
+                />
                 <AsyncButton
                   onClick=(rejectMarked(self))
                   className="Button Button--small">
@@ -142,7 +145,7 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
                     )
                   </div>
                   <ReactPaginate
-                    pageCount=20
+                    pageCount=self.state.totalPages
                     pageRangeDisplayed=1
                     marginPagesDisplayed=1
                     pageClassName="CommentList__paginationItem"
@@ -181,7 +184,9 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
               comments
               |> List.map(_, comment =>
                    CommentData.Comment.(
-                     <div key=(string_of_int(comment.id))>
+                     <div
+                       key=(string_of_int(comment.id))
+                       className="CommentList__commentWrapper">
                        <Comment comment onReject=(reject(comment, self))>
                          <input
                            name="markedForRejection"

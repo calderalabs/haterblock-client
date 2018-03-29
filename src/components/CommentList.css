@@ -1,5 +1,4 @@
 .CommentList {
-  text-align: center;
   border-radius: 4px;
   box-shadow: 0 1px 3px 0 rgba(108, 133, 159, .4);
   margin: 20px;
@@ -7,6 +6,7 @@
 
 .CommentList__header {
   display: flex;
+  text-align: center;
   background-color: #fff;
   border-bottom: 1px solid #d8e0ea;
   border-radius: 4px 4px 0 0;
@@ -19,11 +19,9 @@
 }
 
 .CommentList__comments {
-  padding: 19px 24px;
   background-color: #f4f9fd;
   min-height: 150px;
   display: flex;
-  align-items: center;
   justify-content: center;
 }
 
@@ -35,6 +33,7 @@
   padding: 13px;
   font-size: 13px;
   font-weight: 500;
+  align-self: center;
 }
 
 .CommentList__count {
@@ -78,4 +77,12 @@
 
 .CommentList__paginationItem--active .CommentList__paginationLink, .CommentList__paginationLink:hover {
   background-color: #E7EEF3;
+}
+
+.CommentList__commentWrapper {
+  flex-grow: 1;
+}
+
+.CommentList__bulkActionsIcon {
+  padding-right: 20px;
 }

@@ -1,7 +1,18 @@
 .Comment {
-  display: grid;
-  grid-template-columns: 100px 100px auto 100px;
-  grid-gap: 10px;
-  border-bottom: 1px solid #ddd;
-  padding: 10px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #EEEDF3;
+  padding: 16px 20px;
+}
+
+.Comment__body {
+  flex-grow: 1;
+}
+
+.Comment__bulkActions {
+  display: flex;
+}
+
+.Comment__bulkActions, .Comment__sentiment {
+  padding-right: 20px;
 }
