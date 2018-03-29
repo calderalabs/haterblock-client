@@ -74,23 +74,53 @@ let make = _children => {
       },
     render: ({state, send}) =>
       <div className="App">
-        (
-          switch (state.loadingMessage, state.currentUser) {
-          | (Some(loadingMessage), _) =>
-            <span> (ReasonReact.stringToElement(loadingMessage)) </span>
-          | (None, None) =>
-            <button onClick=(_event => send(Login))>
-              (ReasonReact.stringToElement("Login"))
-            </button>
-          | (None, Some(user)) =>
-            <div>
-              <button onClick=(_event => send(Logout))>
-                (ReasonReact.stringToElement("Logout"))
-              </button>
-              <Dashboard user />
-            </div>
-          }
-        )
+        <div className="App__header">
+          <div className="App__title">
+            (ReasonReact.stringToElement("Haterblock"))
+          </div>
+          <div className="App__headerItems">
+            (
+              switch (state.currentUser) {
+              | Some(user) =>
+                <div className="App__currentUserName">
+                  <button onClick=(_event => send(Logout))>
+                    (ReasonReact.stringToElement("Logout"))
+                  </button>
+                  <div> (ReasonReact.stringToElement(user.name)) </div>
+                </div>
+              | None =>
+                <button onClick=(_event => send(Login))>
+                  (ReasonReact.stringToElement("Login"))
+                </button>
+              }
+            )
+          </div>
+        </div>
+        <div className="App__content">
+          (
+            switch (state.loadingMessage) {
+            | Some(loadingMessage) =>
+              <span> (ReasonReact.stringToElement(loadingMessage)) </span>
+            | None => <Dashboard />
+            }
+          )
+        </div>
+        <div className="App__footer">
+          <a href="http://calderalabs.io" className="App__caldera-labs-logo">
+            <img
+              src="https://dotamastery.io/assets/images/caldera-labs-logo-6a708f5b7a4915b16e468c86c3039a0c.png"
+            />
+          </a>
+          <div>
+            <small>
+              (
+                ReasonReact.stringToElement(
+                  {j|Copyright © 2018 Caldera Labs Ltd.|j},
+                )
+              )
+            </small>
+          </div>
+        </div>
       </div>,
   };
 };

@@ -41,6 +41,13 @@ module Sentiment = {
     | Negative => "negative"
     | Hateful => "hateful"
     };
+  let toString = (sentiment: t) =>
+    switch (sentiment) {
+    | Positive => "Positive"
+    | Neutral => "Neutral"
+    | Negative => "Negative"
+    | Hateful => "Hateful"
+    };
 };
 
 module Comment = {

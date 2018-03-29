@@ -101,25 +101,54 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
       loadComments(self);
       ReasonReact.NoUpdate;
     },
-    render: self => {
-      let totalEntries = self.state.totalEntries;
-      let count =
-        switch (self.state.comments) {
-        | None => 0
-        | Some(comments) => comments |> List.length
-        };
+    render: self =>
       <div className="CommentList">
         <div className="CommentList__header">
           <div>
-            <AsyncButton onClick=(rejectMarked(self))>
-              (ReasonReact.stringToElement("Reject Marked"))
-            </AsyncButton>
+            (
+              switch (self.state.comments) {
+              | None
+              | Some([]) => ReasonReact.nullElement
+              | Some(_) =>
+                <AsyncButton onClick=(rejectMarked(self))>
+                  (ReasonReact.stringToElement("Reject Marked"))
+                </AsyncButton>
+              }
+            )
           </div>
           <div>
             (
               ReasonReact.stringToElement(
-                {j|Showing $(count) of $(totalEntries)|j},
+                CommentData.Sentiment.toString(sentiment),
               )
+            )
+          </div>
+          <div>
+            (
+              switch (self.state.comments) {
+              | None
+              | Some([]) => ReasonReact.nullElement
+              | Some(comments) =>
+                let totalEntries = self.state.totalEntries;
+                let count = comments |> List.length;
+                <div>
+                  <div>
+                    (
+                      ReasonReact.stringToElement(
+                        {j|Showing $(count) of $(totalEntries)|j},
+                      )
+                    )
+                  </div>
+                  <ReactPaginate
+                    pageCount=self.state.totalPages
+                    pageRangeDisplayed=4
+                    marginPagesDisplayed=1
+                    onPageChange=(
+                      data => loadComments(self, ~page=data##selected + 1)
+                    )
+                  />
+                </div>;
+              }
             )
           </div>
         </div>
@@ -159,17 +188,6 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
             }
           )
         </div>
-        <div className="CommentList__footer">
-          <ReactPaginate
-            pageCount=self.state.totalPages
-            pageRangeDisplayed=4
-            marginPagesDisplayed=1
-            onPageChange=(
-              data => loadComments(self, ~page=data##selected + 1)
-            )
-          />
-        </div>
-      </div>;
-    },
+      </div>,
   };
 };
