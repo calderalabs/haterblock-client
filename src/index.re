@@ -2,6 +2,8 @@ open Belt;
 
 [%bs.raw {|require('normalize.css/normalize.css')|}];
 
+[%bs.raw {|require('font-awesome/css/font-awesome.css')|}];
+
 [%bs.raw {|require('./components/Button.css')|}];
 
 [@bs.module "./registerServiceWorker"]

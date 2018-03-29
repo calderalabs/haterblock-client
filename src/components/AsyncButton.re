@@ -10,7 +10,7 @@ type action =
 
 let component = ReasonReact.reducerComponent("AsyncButton");
 
-let make = (~onClick: Callback.action(unit, unit), children) => {
+let make = (~onClick: Callback.action(unit, unit), ~className="", children) => {
   let onLaddaClick = (_event, {ReasonReact.send}) => {
     send(Loading);
     onClick((() => send(Loaded)) |> Callback.finally);
@@ -24,7 +24,8 @@ let make = (~onClick: Callback.action(unit, unit), children) => {
       | Loaded => ReasonReact.Update({loading: false})
       },
     render: ({ReasonReact.handle, state}) =>
-      <LaddaButton onClick=(handle(onLaddaClick)) loading=state.loading>
+      <LaddaButton
+        onClick=(handle(onLaddaClick)) className loading=state.loading>
         children
       </LaddaButton>,
   };

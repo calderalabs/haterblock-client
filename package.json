@@ -6,6 +6,7 @@
     "@glennsl/bs-json": "^1.0.1",
     "bs-fetch": "^0.2.1",
     "bs-moment": "^0.2.4",
+    "font-awesome": "^4.7.0",
     "moment": "^2.21.0",
     "normalize.css": "^8.0.0",
     "react": "^16.2.0",

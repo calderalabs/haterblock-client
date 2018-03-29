@@ -1,18 +1,21 @@
 .CommentList {
   text-align: center;
   border-radius: 4px;
-  box-shadow: 0 1px 3px 0 rgba(108,133,159,.4);
+  box-shadow: 0 1px 3px 0 rgba(108, 133, 159, .4);
   margin: 20px;
 }
 
 .CommentList__header {
-  display: grid;
-  grid-template-columns: 100px auto 100px;
-  grid-gap: 10px;
+  display: flex;
   background-color: #fff;
   border-bottom: 1px solid #d8e0ea;
   border-radius: 4px 4px 0 0;
   padding: 16px 20px;
+  align-items: center;
+}
+
+.CommentList__title {
+  flex-grow: 1;
 }
 
 .CommentList__comments {
@@ -28,8 +31,51 @@
   background-color: #f8f9fc;
   border-radius: 5px;
   border: 1px solid #d4e0e8;
-  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
   padding: 13px;
   font-size: 13px;
   font-weight: 500;
+}
+
+.CommentList__count {
+  font-size: 13px;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.CommentList__pagination {
+  list-style-type: none;
+  display: inline-block;
+  padding-left: 0;
+  margin: 0;
+}
+
+.CommentList__paginationItem {
+  display: inline-block;
+}
+
+.CommentList__bulkActions {
+  text-align: left;
+}
+
+.CommentList__nav {
+  text-align: right;
+}
+
+.CommentList__nav, .CommentList__bulkActions {
+  width: 300px;
+}
+
+.CommentList__paginationLink {
+  font-size: 13px;
+  margin: 0 3px;
+  font-weight: bold;
+  border: 1px solid #d4e0e8;
+  border-radius: 3px;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+
+.CommentList__paginationItem--active .CommentList__paginationLink, .CommentList__paginationLink:hover {
+  background-color: #E7EEF3;
 }

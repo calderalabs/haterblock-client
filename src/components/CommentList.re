@@ -104,19 +104,21 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
     render: self =>
       <div className="CommentList">
         <div className="CommentList__header">
-          <div>
-            (
-              switch (self.state.comments) {
-              | None
-              | Some([]) => ReasonReact.nullElement
-              | Some(_) =>
-                <AsyncButton onClick=(rejectMarked(self))>
+          (
+            switch (self.state.comments) {
+            | None
+            | Some([]) => ReasonReact.nullElement
+            | Some(_) =>
+              <div className="CommentList__bulkActions">
+                <AsyncButton
+                  onClick=(rejectMarked(self))
+                  className="Button Button--small">
                   (ReasonReact.stringToElement("Reject Marked"))
                 </AsyncButton>
-              }
-            )
-          </div>
-          <div>
+              </div>
+            }
+          )
+          <div className="CommentList__title">
             (
               ReasonReact.stringToElement(
                 CommentData.Sentiment.toString(sentiment),
@@ -131,8 +133,8 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
               | Some(comments) =>
                 let totalEntries = self.state.totalEntries;
                 let count = comments |> List.length;
-                <div>
-                  <div>
+                <div className="CommentList__nav">
+                  <div className="CommentList__count">
                     (
                       ReasonReact.stringToElement(
                         {j|Showing $(count) of $(totalEntries)|j},
@@ -140,9 +142,20 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
                     )
                   </div>
                   <ReactPaginate
-                    pageCount=self.state.totalPages
-                    pageRangeDisplayed=4
+                    pageCount=20
+                    pageRangeDisplayed=1
                     marginPagesDisplayed=1
+                    pageClassName="CommentList__paginationItem"
+                    containerClassName="CommentList__pagination"
+                    previousClassName="CommentList__paginationItem"
+                    nextClassName="CommentList__paginationItem"
+                    previousLinkClassName="CommentList__paginationLink"
+                    nextLinkClassName="CommentList__paginationLink"
+                    activeClassName="CommentList__paginationItem--active"
+                    pageLinkClassName="CommentList__paginationLink"
+                    breakClassName="CommentList__paginationItem"
+                    previousLabel=<span className="fa fa-chevron-left" />
+                    nextLabel=<span className="fa fa-chevron-right" />
                     onPageChange=(
                       data => loadComments(self, ~page=data##selected + 1)
                     )
