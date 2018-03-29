@@ -42,7 +42,6 @@ let make = _children => {
       currentUser: None,
     },
     didMount: ({ReasonReact.send}) => {
-      fetchCurrentUser(send);
       Gapi.load(~libs="auth2:client", ~callback=() => {
         Gapi.init(
           ~clientId=
@@ -50,7 +49,7 @@ let make = _children => {
           ~scope=
             "profile email https://www.googleapis.com/auth/youtube.force-ssl",
         );
-        send(Loaded);
+        fetchCurrentUser(send);
       });
       ReasonReact.NoUpdate;
     },
