@@ -30,7 +30,6 @@
   padding: 13px;
   font-size: 13px;
   font-weight: 500;
-  align-self: center;
 }
 
 .CommentList__emptyComments {
@@ -38,6 +37,7 @@
   display: flex;
   min-height: 200px;
   justify-content: center;
+  align-items: center;
 }
 
 .CommentList__count {
