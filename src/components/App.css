@@ -15,6 +15,14 @@
 .App {
   font-family: "Helvetica Neue", Helvetica, Tahoma, Geneva, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  color: #5c617b;
+  background-color: #E7EEF3;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
 }
 
 .App__headerItems {
@@ -24,4 +32,29 @@
 
 .App__currentUserName {
   padding-right: 15px;
+}
+
+.App__footer {
+  text-align: center;
+}
+
+.App__calderaLabsLogo {
+  display: inline-block;
+  filter: grayscale(100%);
+  transition: filter 300ms;
+  margin-bottom: 10px;
+}
+
+.App__calderaLabsLogo:hover {
+  filter: grayscale(0);
+}
+
+.App__footer {
+  margin-top: 100px;
+}
+
+.App__contentInner {
+  width: 100%;
+  max-width: 1366px;
+  margin: 0 auto;
 }

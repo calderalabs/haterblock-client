@@ -1,12 +1,35 @@
 .CommentList {
   text-align: center;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgba(108,133,159,.4);
+  margin: 20px;
 }
 
 .CommentList__header {
   display: grid;
-  grid-template-columns: 100px auto;
-  background-color: #ccc;
+  grid-template-columns: 100px auto 100px;
   grid-gap: 10px;
-  padding: 10px;
-  margin-bottom: 10px;
+  background-color: #fff;
+  border-bottom: 1px solid #d8e0ea;
+  border-radius: 4px 4px 0 0;
+  padding: 16px 20px;
+}
+
+.CommentList__comments {
+  padding: 19px 24px;
+  background-color: #f4f9fd;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.CommentList__emptyMessage {
+  background-color: #f8f9fc;
+  border-radius: 5px;
+  border: 1px solid #d4e0e8;
+  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+  padding: 13px;
+  font-size: 13px;
+  font-weight: 500;
 }

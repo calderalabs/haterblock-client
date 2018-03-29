@@ -157,7 +157,13 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
             switch (self.state.comments) {
             | None => ReasonReact.stringToElement("Loading")
             | Some([]) =>
-              ReasonReact.stringToElement("There are no comments to display")
+              <div className="CommentList__emptyMessage">
+                (
+                  ReasonReact.stringToElement(
+                    "There are no comments to display",
+                  )
+                )
+              </div>
             | Some(comments) =>
               comments
               |> List.map(_, comment =>

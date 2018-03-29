@@ -83,10 +83,11 @@ let make = _children => {
               switch (state.currentUser) {
               | Some(user) =>
                 [|
-                  <div className="App__currentUserName">
+                  <div key="0" className="App__currentUserName">
                     (ReasonReact.stringToElement(user.name))
                   </div>,
                   <button
+                    key="1"
                     className="Button Button--small"
                     onClick=(_event => send(Logout))>
                     (ReasonReact.stringToElement("Logout"))
@@ -102,19 +103,19 @@ let make = _children => {
           </div>
         </div>
         <div className="App__content">
-          (
-            switch (state.loadingMessage) {
-            | Some(loadingMessage) =>
-              <span> (ReasonReact.stringToElement(loadingMessage)) </span>
-            | None => <Dashboard />
-            }
-          )
+          <div className="App__contentInner">
+            (
+              switch (state.loadingMessage) {
+              | Some(loadingMessage) =>
+                <span> (ReasonReact.stringToElement(loadingMessage)) </span>
+              | None => <Dashboard />
+              }
+            )
+          </div>
         </div>
         <div className="App__footer">
-          <a href="http://calderalabs.io" className="App__caldera-labs-logo">
-            <img
-              src="https://dotamastery.io/assets/images/caldera-labs-logo-6a708f5b7a4915b16e468c86c3039a0c.png"
-            />
+          <a href="http://calderalabs.io" className="App__calderaLabsLogo">
+            <img src=Assets.calderaLabsLogo />
           </a>
           <div>
             <small>
