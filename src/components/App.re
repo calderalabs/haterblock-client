@@ -82,12 +82,17 @@ let make = _children => {
             (
               switch (state.currentUser) {
               | Some(user) =>
-                <div className="App__currentUserName">
-                  <button onClick=(_event => send(Logout))>
+                [|
+                  <div className="App__currentUserName">
+                    (ReasonReact.stringToElement(user.name))
+                  </div>,
+                  <button
+                    className="Button Button--small"
+                    onClick=(_event => send(Logout))>
                     (ReasonReact.stringToElement("Logout"))
-                  </button>
-                  <div> (ReasonReact.stringToElement(user.name)) </div>
-                </div>
+                  </button>,
+                |]
+                |> ReasonReact.arrayToElement
               | None =>
                 <button onClick=(_event => send(Login))>
                   (ReasonReact.stringToElement("Login"))

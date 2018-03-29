@@ -1,0 +1,27 @@
+.App__header {
+  background: #083bc1 linear-gradient(90deg, #083bc1 0, #07b2d7);
+  padding: 20px;
+  color: #ffffff;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.App__title {
+  flex-grow: 1;
+  font-size: 20px;
+}
+
+.App {
+  font-family: "Helvetica Neue", Helvetica, Tahoma, Geneva, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.App__headerItems {
+  display: flex;
+  align-items: center;
+}
+
+.App__currentUserName {
+  padding-right: 15px;
+}
