@@ -168,11 +168,16 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
             )
           </div>
         </div>
-        <div className="CommentList__comments">
-          (
-            switch (self.state.comments) {
-            | None => ReasonReact.stringToElement("Loading")
-            | Some([]) =>
+        (
+          switch (self.state.comments) {
+          | None =>
+            <div className="CommentList__emptyComments">
+              <div className="CommentList__emptyMessage">
+                (ReasonReact.stringToElement("Loading..."))
+              </div>
+            </div>
+          | Some([]) =>
+            <div className="CommentList__emptyComments">
               <div className="CommentList__emptyMessage">
                 (
                   ReasonReact.stringToElement(
@@ -180,38 +185,43 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
                   )
                 )
               </div>
-            | Some(comments) =>
-              comments
-              |> List.map(_, comment =>
-                   CommentData.Comment.(
-                     <div
-                       key=(string_of_int(comment.id))
-                       className="CommentList__commentWrapper">
-                       <Comment comment onReject=(reject(comment, self))>
-                         <input
-                           name="markedForRejection"
-                           _type="checkbox"
-                           checked=(
-                             Js.Boolean.to_js_boolean(
-                               isMarkedForRejection(
-                                 self.state.markedForRejection,
-                                 comment,
-                               ),
+            </div>
+          | Some(comments) =>
+            <div className="CommentList__comments">
+              (
+                comments
+                |> List.map(_, comment =>
+                     CommentData.Comment.(
+                       <div
+                         key=(string_of_int(comment.id))
+                         className="CommentList__commentWrapper">
+                         <Comment comment onReject=(reject(comment, self))>
+                           <input
+                             name="markedForRejection"
+                             _type="checkbox"
+                             checked=(
+                               Js.Boolean.to_js_boolean(
+                                 isMarkedForRejection(
+                                   self.state.markedForRejection,
+                                   comment,
+                                 ),
+                               )
                              )
-                           )
-                           onChange=(
-                             _event => self.send(ToggleForRejection(comment))
-                           )
-                         />
-                       </Comment>
-                     </div>
+                             onChange=(
+                               _event =>
+                                 self.send(ToggleForRejection(comment))
+                             )
+                           />
+                         </Comment>
+                       </div>
+                     )
                    )
-                 )
-              |> List.toArray
-              |> ReasonReact.arrayToElement
-            }
-          )
-        </div>
+                |> List.toArray
+                |> ReasonReact.arrayToElement
+              )
+            </div>
+          }
+        )
       </div>,
   };
 };

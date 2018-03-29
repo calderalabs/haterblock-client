@@ -20,9 +20,6 @@
 
 .CommentList__comments {
   background-color: #f4f9fd;
-  min-height: 150px;
-  display: flex;
-  justify-content: center;
 }
 
 .CommentList__emptyMessage {
@@ -34,6 +31,13 @@
   font-size: 13px;
   font-weight: 500;
   align-self: center;
+}
+
+.CommentList__emptyComments {
+  background-color: #f4f9fd;
+  display: flex;
+  min-height: 200px;
+  justify-content: center;
 }
 
 .CommentList__count {
@@ -85,4 +89,5 @@
 
 .CommentList__bulkActionsIcon {
   padding-right: 20px;
+  color: #a6aabc;
 }
