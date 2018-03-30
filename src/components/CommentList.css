@@ -16,6 +16,7 @@
 
 .CommentList__title {
   flex-grow: 1;
+  font-weight: bold;
 }
 
 .CommentList__comments {
