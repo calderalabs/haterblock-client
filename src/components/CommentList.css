@@ -4,21 +4,6 @@
   margin: 20px;
 }
 
-.CommentList__header {
-  display: flex;
-  text-align: center;
-  background-color: #fff;
-  border-bottom: 1px solid #d8e0ea;
-  border-radius: 4px 4px 0 0;
-  padding: 16px 20px;
-  align-items: center;
-}
-
-.CommentList__title {
-  flex-grow: 1;
-  font-weight: bold;
-}
-
 .CommentList__comments {
   background-color: #f4f9fd;
 }
@@ -41,54 +26,6 @@
   align-items: center;
 }
 
-.CommentList__count {
-  font-size: 13px;
-  display: inline-block;
-  margin-right: 5px;
-}
-
-.CommentList__pagination {
-  list-style-type: none;
-  display: inline-block;
-  padding-left: 0;
-  margin: 0;
-}
-
-.CommentList__paginationItem {
-  display: inline-block;
-}
-
-.CommentList__bulkActions {
-  text-align: left;
-}
-
-.CommentList__nav {
-  text-align: right;
-}
-
-.CommentList__nav, .CommentList__bulkActions {
-  width: 300px;
-}
-
-.CommentList__paginationLink {
-  font-size: 13px;
-  margin: 0 3px;
-  font-weight: bold;
-  border: 1px solid #d4e0e8;
-  border-radius: 3px;
-  padding: 3px 6px;
-  cursor: pointer;
-}
-
-.CommentList__paginationItem--active .CommentList__paginationLink, .CommentList__paginationLink:hover {
-  background-color: #E7EEF3;
-}
-
 .CommentList__commentWrapper {
   flex-grow: 1;
-}
-
-.CommentList__bulkActionsIcon {
-  padding-right: 20px;
-  color: #a6aabc;
 }

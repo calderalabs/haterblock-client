@@ -1,0 +1,62 @@
+.CommentListHeader {
+  display: flex;
+  text-align: center;
+  background-color: #fff;
+  border-bottom: 1px solid #d8e0ea;
+  border-radius: 4px 4px 0 0;
+  padding: 16px 20px;
+  align-items: center;
+}
+
+.CommentListHeader__title {
+  flex-grow: 1;
+  font-weight: bold;
+}
+
+.CommentListHeader__count {
+  font-size: 13px;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.CommentListHeader__pagination {
+  list-style-type: none;
+  display: inline-block;
+  padding-left: 0;
+  margin: 0;
+}
+
+.CommentListHeader__paginationItem {
+  display: inline-block;
+}
+
+.CommentListHeader__bulkActions {
+  text-align: left;
+}
+
+.CommentListHeader__nav {
+  text-align: right;
+}
+
+.CommentListHeader__nav, .CommentListHeader__bulkActions {
+  width: 300px;
+}
+
+.CommentListHeader__paginationLink {
+  font-size: 13px;
+  margin: 0 3px;
+  font-weight: bold;
+  border: 1px solid #d4e0e8;
+  border-radius: 3px;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+
+.CommentListHeader__bulkActionsIcon {
+  padding-right: 20px;
+  color: #a6aabc;
+}
+
+.CommentListHeader__paginationItem--active .CommentListHeader__paginationLink, .CommentListHeader__paginationLink:hover {
+  background-color: #E7EEF3;
+}

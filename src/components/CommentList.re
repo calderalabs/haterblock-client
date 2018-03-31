@@ -103,71 +103,14 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
     },
     render: self =>
       <div className="CommentList">
-        <div className="CommentList__header">
-          (
-            switch (self.state.comments) {
-            | None
-            | Some([]) => ReasonReact.nullElement
-            | Some(_) =>
-              <div className="CommentList__bulkActions">
-                <span
-                  className="fa fa-arrow-down CommentList__bulkActionsIcon"
-                />
-                <AsyncButton
-                  onClick=(rejectMarked(self))
-                  className="Button Button--small">
-                  (ReasonReact.stringToElement("Reject Marked"))
-                </AsyncButton>
-              </div>
-            }
-          )
-          <div className="CommentList__title">
-            (
-              ReasonReact.stringToElement(
-                CommentData.Sentiment.toString(sentiment),
-              )
-            )
-          </div>
-          <div>
-            (
-              switch (self.state.comments) {
-              | None
-              | Some([]) => ReasonReact.nullElement
-              | Some(comments) =>
-                let totalEntries = self.state.totalEntries;
-                let count = comments |> List.length;
-                <div className="CommentList__nav">
-                  <div className="CommentList__count">
-                    (
-                      ReasonReact.stringToElement(
-                        {j|Showing $(count) of $(totalEntries)|j},
-                      )
-                    )
-                  </div>
-                  <ReactPaginate
-                    pageCount=self.state.totalPages
-                    pageRangeDisplayed=1
-                    marginPagesDisplayed=1
-                    pageClassName="CommentList__paginationItem"
-                    containerClassName="CommentList__pagination"
-                    previousClassName="CommentList__paginationItem"
-                    nextClassName="CommentList__paginationItem"
-                    previousLinkClassName="CommentList__paginationLink"
-                    nextLinkClassName="CommentList__paginationLink"
-                    activeClassName="CommentList__paginationItem--active"
-                    pageLinkClassName="CommentList__paginationLink"
-                    breakClassName="CommentList__paginationItem"
-                    previousLabel=<span className="fa fa-chevron-left" />
-                    nextLabel=<span className="fa fa-chevron-right" />
-                    onPageChange=(
-                      data => loadComments(self, ~page=data##selected + 1)
-                    )
-                  />
-                </div>;
-              }
-            )
-          </div>
-        </div>
+        <CommentListHeader
+          comments=self.state.comments
+          onRejectMarked=(rejectMarked(self))
+          onPageChange=(page => loadComments(self, ~page))
+          totalEntries=self.state.totalEntries
+          totalPages=self.state.totalPages
+          sentiment
+        />
         (
           switch (self.state.comments) {
           | None =>
