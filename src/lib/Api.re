@@ -4,11 +4,18 @@ exception RequestFailed;
 
 [@bs.val] external environment : string = "process.env.NODE_ENV";
 
+let baseHost =
+  switch (environment) {
+  | "development" => "localhost:4000"
+  | "production" => "api.gethaterblock.com"
+  | _ => "localhost:4000"
+  };
+
 let baseUrl =
   switch (environment) {
-  | "development" => "http://localhost:4000"
-  | "production" => "https://api.gethaterblock.com"
-  | _ => "http://localhost:4000"
+  | "development" => {j|http://$baseHost|j}
+  | "production" => {j|"https://$baseHost"|j}
+  | _ => {j|http://$baseHost|j}
   };
 
 let requestHeaders = () => {

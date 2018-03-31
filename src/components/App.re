@@ -114,7 +114,7 @@ let make = _children => {
                     (ReasonReact.stringToElement(loadingMessage))
                   </div>
                 </div>
-              | (Some(_), None) => <Dashboard />
+              | (Some(user), None) => <Dashboard user />
               | (None, _) => ReasonReact.nullElement
               }
             )
