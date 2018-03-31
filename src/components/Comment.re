@@ -21,6 +21,7 @@ let make =
       _children,
     ) => {
   let sentiment = sentimentToEmoji(comment.sentiment);
+  let rejected = comment.status == Rejected;
   {
     ...component,
     render: _self =>
@@ -30,6 +31,7 @@ let make =
             name="markedForRejection"
             _type="checkbox"
             checked=Js.Boolean.to_js_boolean(checked)
+            disabled=Js.Boolean.to_js_boolean(rejected)
             onChange=(_event => onChange())
           />
         </div>
