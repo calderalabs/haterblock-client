@@ -101,7 +101,11 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
       loadComments(self);
       ReasonReact.NoUpdate;
     },
-    render: self =>
+    render: self => {
+      let isChecked = (comment: CommentData.Comment.t) =>
+        Js.Boolean.to_js_boolean(
+          isMarkedForRejection(self.state.markedForRejection, comment),
+        );
       <div className="CommentList">
         <CommentListHeader
           comments=self.state.comments
@@ -138,24 +142,12 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
                        <div
                          key=(string_of_int(comment.id))
                          className="CommentList__commentWrapper">
-                         <Comment comment onReject=(reject(comment, self))>
-                           <input
-                             name="markedForRejection"
-                             _type="checkbox"
-                             checked=(
-                               Js.Boolean.to_js_boolean(
-                                 isMarkedForRejection(
-                                   self.state.markedForRejection,
-                                   comment,
-                                 ),
-                               )
-                             )
-                             onChange=(
-                               _event =>
-                                 self.send(ToggleForRejection(comment))
-                             )
-                           />
-                         </Comment>
+                         <Comment
+                           comment
+                           onReject=(reject(comment, self))
+                           checked=(isChecked(comment))
+                           onChange=(() => self.send(ToggleForRejection(comment)))
+                         />
                        </div>
                      )
                    )
@@ -165,6 +157,7 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
             </div>
           }
         )
-      </div>,
+      </div>;
+    },
   };
 };

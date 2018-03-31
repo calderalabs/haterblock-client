@@ -16,20 +16,23 @@ let make =
     (
       ~comment: CommentData.Comment.t,
       ~onReject: Callback.action(unit, unit),
-      children,
+      ~checked: Js.boolean,
+      ~onChange: unit => unit,
+      _children,
     ) => {
   let sentiment = sentimentToEmoji(comment.sentiment);
   {
     ...component,
     render: _self =>
       <div className="Comment">
-        (
-          ReasonReact.createDomElement(
-            "div",
-            ~props={"className": "Comment__bulkActions"},
-            children,
-          )
-        )
+        <div className="Comment__bulkActions">
+          <input
+            name="markedForRejection"
+            _type="checkbox"
+            checked
+            onChange=(_event => onChange())
+          />
+        </div>
         <div className="Comment__sentiment">
           (ReasonReact.stringToElement(sentiment))
         </div>
