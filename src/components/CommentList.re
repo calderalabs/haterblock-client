@@ -101,11 +101,7 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
       loadComments(self);
       ReasonReact.NoUpdate;
     },
-    render: self => {
-      let isChecked = (comment: CommentData.Comment.t) =>
-        Js.Boolean.to_js_boolean(
-          isMarkedForRejection(self.state.markedForRejection, comment),
-        );
+    render: self =>
       <div className="CommentList">
         <CommentListHeader
           comments=self.state.comments
@@ -145,7 +141,7 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
                          <Comment
                            comment
                            onReject=(reject(comment, self))
-                           checked=(isChecked(comment))
+                           checked=(isMarkedForRejection(self.state.markedForRejection, comment))
                            onChange=(() => self.send(ToggleForRejection(comment)))
                          />
                        </div>
@@ -157,7 +153,6 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
             </div>
           }
         )
-      </div>;
-    },
+      </div>
   };
 };

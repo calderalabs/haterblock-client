@@ -16,7 +16,7 @@ let make =
     (
       ~comment: CommentData.Comment.t,
       ~onReject: Callback.action(unit, unit),
-      ~checked: Js.boolean,
+      ~checked: bool,
       ~onChange: unit => unit,
       _children,
     ) => {
@@ -29,7 +29,7 @@ let make =
           <input
             name="markedForRejection"
             _type="checkbox"
-            checked
+            checked=Js.Boolean.to_js_boolean(checked)
             onChange=(_event => onChange())
           />
         </div>
