@@ -12,7 +12,8 @@ type state = {
 type action =
   | Reject(list(CommentData.Comment.t), unit => unit)
   | ToggleForRejection(CommentData.Comment.t)
-  | CommentsLoaded(JsonApi.Document.decodedMany(CommentData.Comment.t));
+  | CommentsLoaded(JsonApi.Document.decodedMany(CommentData.Comment.t))
+  | ToggleAllForRejection;
 
 let component = ReasonReact.reducerComponent("CommentList");
 
@@ -89,6 +90,20 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
             state.markedForRejection |> List.keep(_, id => comment.id != id) :
             [comment.id, ...state.markedForRejection];
         ReasonReact.Update({...state, markedForRejection});
+      | ToggleAllForRejection => {
+        let publishedComments = CommentData.Comment.publishedComments(state.comments);
+        let allCommentsMarkedForRejection = List.length(publishedComments) == List.length(state.markedForRejection);
+        let markedForRejection = if (allCommentsMarkedForRejection) {
+          []
+        } else {
+          publishedComments
+          |> List.reduce(_, state.markedForRejection, (acc, comment) =>
+               isMarkedForRejection(state.markedForRejection, comment) ?
+                 acc : List.add(acc, comment.id)
+             );
+        };
+        ReasonReact.Update({...state, markedForRejection});
+      }
       | CommentsLoaded(document) =>
         ReasonReact.Update({
           ...state,
@@ -111,6 +126,7 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
           totalPages=self.state.totalPages
           markedForRejection=self.state.markedForRejection
           sentiment
+          onSelectAll=(() => self.send(ToggleAllForRejection))
         />
         (
           switch (self.state.comments) {
@@ -142,8 +158,15 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
                          <Comment
                            comment
                            onReject=(reject(comment, self))
-                           checked=(isMarkedForRejection(self.state.markedForRejection, comment))
-                           onChange=(() => self.send(ToggleForRejection(comment)))
+                           checked=(
+                             isMarkedForRejection(
+                               self.state.markedForRejection,
+                               comment,
+                             )
+                           )
+                           onChange=(
+                             () => self.send(ToggleForRejection(comment))
+                           )
                          />
                        </div>
                      )
@@ -154,6 +177,6 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
             </div>
           }
         )
-      </div>
+      </div>,
   };
 };

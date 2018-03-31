@@ -101,6 +101,12 @@ module Comment = {
         let toModel = (record: t) : Model.t => {id: record.id};
       },
     );
+  let publishedComments = (comments: option(list(t))) =>
+    switch (comments) {
+    | None => []
+    | Some(comments) =>
+      comments |> List.keep(_, comment => comment.status == Published)
+    };
 };
 
 let fetchAll =
