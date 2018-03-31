@@ -16,6 +16,8 @@ let make =
       "className": className,
       "loading": Js.Boolean.to_js_boolean(loading),
       "disabled": Js.Boolean.to_js_boolean(disabled),
+      "data-style": "slide-left",
+      "data-spinner-color": "#5c617b",
     },
     children,
   );

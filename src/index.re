@@ -4,6 +4,8 @@ open Belt;
 
 [%bs.raw {|require('font-awesome/css/font-awesome.css')|}];
 
+[%bs.raw {|require('ladda/dist/ladda.min.css')|}];
+
 [%bs.raw {|require('./components/Button.css')|}];
 
 [@bs.module "./registerServiceWorker"]
