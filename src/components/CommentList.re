@@ -109,6 +109,7 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
           onPageChange=(page => loadComments(self, ~page))
           totalEntries=self.state.totalEntries
           totalPages=self.state.totalPages
+          markedForRejection=self.state.markedForRejection
           sentiment
         />
         (

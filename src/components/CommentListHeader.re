@@ -12,6 +12,7 @@ let make =
       ~sentiment: CommentData.Sentiment.t,
       ~onPageChange: int => unit,
       ~onRejectMarked: Callback.action(unit, unit),
+      ~markedForRejection: list(Model.id),
       _children,
     ) => {
   ...component,
@@ -27,7 +28,9 @@ let make =
               className="fa fa-arrow-down CommentListHeader__bulkActionsIcon"
             />
             <AsyncButton
-              onClick=onRejectMarked className="Button Button--small">
+              onClick=onRejectMarked
+              disabled=(List.length(markedForRejection) == 0)
+              className="Button Button--small">
               (ReasonReact.stringToElement("Reject Marked"))
             </AsyncButton>
           </div>
