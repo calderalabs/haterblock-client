@@ -21,7 +21,7 @@ type socket = {
   [@bs.meth] "channel": string => channel,
 };
 
-[@bs.module "phoenix/assets/js/phoenix"] [@bs.new]
+[@bs.module "phoenix/priv/static/phoenix"] [@bs.new]
 external socket : (string, socketParams) => socket = "Socket";
 
 let join =
