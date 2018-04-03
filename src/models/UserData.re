@@ -1,11 +1,13 @@
 open Belt;
 
+open MomentRe;
+
 module User = {
   type t = {
     id: Model.id,
     name: string,
     email: string,
-    syncing: bool,
+    syncedAt: option(Moment.t),
   };
   include
     JsonApi.MakeDecoder(
@@ -14,23 +16,29 @@ module User = {
         type attributes = {
           name: string,
           email: string,
-          syncing: bool,
+          syncedAt: Js.Null.t(string),
         };
         let attributesDecoder = (json: Js.Json.t) : attributes =>
           Json.Decode.{
             name: json |> field("name", string),
             email: json |> field("email", string),
-            syncing: json |> field("syncing", bool),
+            syncedAt: json |> nullable(field("synced_at", string)),
           };
         let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : t =>
           switch (resource.attributes) {
-          | None => {id: resource.id, name: "", email: "", syncing: false}
-          | Some(attributes) => {
+          | None => {id: resource.id, name: "", email: "", syncedAt: None}
+          | Some(attributes) =>
+            let syncedAt =
+              switch (Js.Null.toOption(attributes.syncedAt)) {
+              | None => None
+              | Some(syncedAt) => Some(moment(syncedAt))
+              };
+            {
               id: resource.id,
               name: attributes.name,
               email: attributes.email,
-              syncing: attributes.syncing,
-            }
+              syncedAt,
+            };
           };
       },
     );

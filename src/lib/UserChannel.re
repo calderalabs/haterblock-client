@@ -1,6 +1,10 @@
 type response;
 
-type payload = {. "syncing": bool};
+type payload = {
+  .
+  "synced_at": Js.Null.t(string),
+  "new_comment_count": int,
+};
 
 type channel = {
   .
@@ -26,17 +30,12 @@ let join =
   let baseHost = Api.baseHost;
   let socket =
     socket({j|ws://$(baseHost)/socket|j}, {
-                                           "params": {
-                                             "token": token,
-                                           },
-                                         });
+                                            "params": {
+                                              "token": token,
+                                            },
+                                          });
   socket##connect();
   let channel = socket##channel({j|user:$userId|j});
-  channel##on("user_changed", callback);
-  channel##join()##receive("ok", response =>
-    Js.log2("Joined successfully", response)
-  )##receive(
-    "error", response =>
-    Js.log2("Failed to join", response)
-  );
+  channel##on("syncing_updated", callback);
+  channel##join();
 };
