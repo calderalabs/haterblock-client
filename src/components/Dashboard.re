@@ -1,22 +1,30 @@
 open Belt;
 
+open MomentRe;
+
 [%bs.raw {|require('./Dashboard.css')|}];
 
-type state = {syncing: bool};
+type state = {
+  syncedAt: option(Moment.t),
+  newCommentCount: int,
+};
 
 type action =
-  | StartedSyncing
-  | FinishedSyncing;
+  | FinishedSyncing(option(Moment.t), int);
 
 let component = ReasonReact.reducerComponent("Dashboard");
 
 let make = (~user: UserData.User.t, _children) => {
   ...component,
-  initialState: () => {syncing: user.syncing},
-  reducer: (action, _state) =>
+  initialState: () => {syncedAt: user.syncedAt, newCommentCount: 0},
+  reducer: (action, state) =>
     switch (action) {
-    | StartedSyncing => ReasonReact.Update({syncing: true})
-    | FinishedSyncing => ReasonReact.Update({syncing: false})
+    | FinishedSyncing(syncedAt, newCommentCount) =>
+      ReasonReact.Update({
+        syncedAt,
+        newCommentCount:
+          user.syncedAt == None ? 0 : state.newCommentCount + newCommentCount,
+      })
     },
   didMount: _self =>
     switch (Session.getToken()) {
@@ -25,12 +33,17 @@ let make = (~user: UserData.User.t, _children) => {
       ReasonReact.SideEffects(
         (
           ({ReasonReact.send}) =>
-            UserChannel.join(~user, ~token, ~callback=payload =>
-              if (Js.Boolean.to_js_boolean(payload##syncing) == Js.true_) {
-                send(StartedSyncing);
-              } else {
-                send(FinishedSyncing);
-              }
+            UserChannel.join(
+              ~user,
+              ~token,
+              ~callback=payload => {
+                let syncedAt =
+                  switch (Js.Null.toOption(payload##synced_at)) {
+                  | None => None
+                  | Some(syncedAt) => Some(moment(syncedAt))
+                  };
+                send(FinishedSyncing(syncedAt, payload##new_comment_count));
+              },
             )
             |> ignore
         ),
@@ -39,15 +52,36 @@ let make = (~user: UserData.User.t, _children) => {
   render: ({ReasonReact.state}) =>
     <div className="Dashboard">
       (
-        if (state.syncing) {
-          ReasonReact.stringToElement("Syncing");
+        if (state.syncedAt == None) {
+          <div className="App__loadingMessageWrapper">
+            <div className="App__loadingMessage">
+              (ReasonReact.stringToElement("Syncing..."))
+            </div>
+          </div>;
         } else {
-          ReasonReact.nullElement;
+          <div>
+            (
+              if (state.newCommentCount != 0) {
+                let count = state.newCommentCount;
+                let message =
+                  state.newCommentCount == 1 ?
+                    "There is 1 new comment, refresh the page to see it." :
+                    {j|There are $count new comments, refresh the page to see them.|j};
+                <div className="App__loadingMessageWrapper">
+                  <div className="App__loadingMessage">
+                    (ReasonReact.stringToElement(message))
+                  </div>
+                </div>;
+              } else {
+                ReasonReact.nullElement;
+              }
+            )
+            <CommentList sentiment=Hateful />
+            <CommentList sentiment=Negative />
+            <CommentList sentiment=Neutral />
+            <CommentList sentiment=Positive />
+          </div>;
         }
       )
-      <CommentList sentiment=Hateful />
-      <CommentList sentiment=Negative />
-      <CommentList sentiment=Neutral />
-      <CommentList sentiment=Positive />
     </div>,
 };
