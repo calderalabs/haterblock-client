@@ -12,7 +12,7 @@ let component = ReasonReact.reducerComponent("Dashboard");
 
 let make = (~user: UserData.User.t, _children) => {
   ...component,
-  initialState: () => {syncing: false},
+  initialState: () => {syncing: user.syncing},
   reducer: (action, _state) =>
     switch (action) {
     | StartedSyncing => ReasonReact.Update({syncing: true})
@@ -25,13 +25,12 @@ let make = (~user: UserData.User.t, _children) => {
       ReasonReact.SideEffects(
         (
           ({ReasonReact.send}) =>
-            UserChannel.join(~user, ~token, ~callback=payload => {
+            UserChannel.join(~user, ~token, ~callback=payload =>
               if (Js.Boolean.to_js_boolean(payload##syncing) == Js.true_) {
                 send(StartedSyncing);
               } else {
                 send(FinishedSyncing);
-              };
-            }
+              }
             )
             |> ignore
         ),

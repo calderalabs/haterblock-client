@@ -5,6 +5,7 @@ module User = {
     id: Model.id,
     name: string,
     email: string,
+    syncing: bool,
   };
   include
     JsonApi.MakeDecoder(
@@ -13,19 +14,22 @@ module User = {
         type attributes = {
           name: string,
           email: string,
+          syncing: bool,
         };
         let attributesDecoder = (json: Js.Json.t) : attributes =>
           Json.Decode.{
             name: json |> field("name", string),
             email: json |> field("email", string),
+            syncing: json |> field("syncing", bool),
           };
         let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : t =>
           switch (resource.attributes) {
-          | None => {id: resource.id, name: "", email: ""}
+          | None => {id: resource.id, name: "", email: "", syncing: false}
           | Some(attributes) => {
               id: resource.id,
               name: attributes.name,
               email: attributes.email,
+              syncing: attributes.syncing,
             }
           };
       },
