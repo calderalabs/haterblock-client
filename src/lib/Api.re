@@ -14,7 +14,7 @@ let baseHost =
 let baseUrl =
   switch (environment) {
   | "development" => {j|http://$baseHost|j}
-  | "production" => {j|"https://$baseHost"|j}
+  | "production" => {j|https://$baseHost|j}
   | _ => {j|http://$baseHost|j}
   };
 
