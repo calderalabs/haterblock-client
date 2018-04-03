@@ -2,10 +2,14 @@ open Belt;
 
 let auth2 = ref(None);
 
-type response = {
+type error = {. "error": string};
+
+type response = {. "code": string};
+
+type googlePromise = {
   .
-  "code": string,
-  [@bs.return nullable] "error": option(string),
+  [@bs.meth] "_then": (response => unit) => googlePromise,
+  [@bs.meth] "catch": (error => unit) => googlePromise,
 };
 
 type gapi = {
@@ -20,12 +24,7 @@ type gapi = {
         "client_id": string,
         "scope": string,
       } =>
-      {
-        .
-        [@bs.meth]
-        "grantOfflineAccess":
-          unit => {. [@bs.meth] "_then": (response => unit) => unit},
-      },
+      {. [@bs.meth] "grantOfflineAccess": unit => googlePromise},
   },
 };
 
@@ -37,9 +36,16 @@ let load = (~libs: string, ~callback: unit => unit) =>
 let init = (~clientId: string, ~scope: string) =>
   auth2 := Some(gapi##auth2##init({"client_id": clientId, "scope": scope}));
 
-let grantOfflineAccess = (callback: response => unit) =>
+let grantOfflineAccess =
+    (callback: Callback.response(response, error) => unit) =>
   switch (auth2^) {
   | Some(auth2) =>
-    auth2##grantOfflineAccess()##_then(response => callback(response))
+    auth2##grantOfflineAccess()##_then(response =>
+      callback(Success(response))
+    )##catch(
+      error =>
+      callback(Error(error))
+    )
+    |> ignore
   | None => ()
   };

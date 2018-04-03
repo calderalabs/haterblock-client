@@ -19,9 +19,9 @@ let getToken = () => Dom.Storage.(getItem("token", localStorage));
 
 let login = (callback: Callback.t(unit, unit)) =>
   Gapi.grantOfflineAccess(response =>
-    switch (response##error) {
-    | Some(_error) => callback(Error())
-    | None =>
+    switch (response) {
+    | Error(_error) => callback(Error())
+    | Success(response) =>
       Api.request(
         ~method=Fetch.Post,
         ~path="/auth/google/callback",
