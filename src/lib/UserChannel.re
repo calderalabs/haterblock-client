@@ -1,3 +1,5 @@
+[@bs.val] external environment : string = "process.env.NODE_ENV";
+
 type response;
 
 type payload = {
@@ -28,12 +30,21 @@ let join =
     (~user: UserData.User.t, ~token: string, ~callback: payload => unit) => {
   let userId = user.id;
   let baseHost = Api.baseHost;
+  let protocol =
+    switch (environment) {
+    | "production" => "wss://"
+    | "development" => "ws://"
+    | _ => "ws://"
+    };
   let socket =
-    socket({j|ws://$(baseHost)/socket|j}, {
-                                            "params": {
-                                              "token": token,
-                                            },
-                                          });
+    socket(
+      {j|$(protocol)$(baseHost)/socket|j},
+      {
+        "params": {
+          "token": token,
+        },
+      },
+    );
   socket##connect();
   let channel = socket##channel({j|user:$userId|j});
   channel##on("syncing_updated", callback);
