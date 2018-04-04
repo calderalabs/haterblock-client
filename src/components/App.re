@@ -114,7 +114,18 @@ let make = _children => {
                   (ReasonReact.stringToElement(loadingMessage))
                 </MessageBox>
               | (Some(user), None) => <Dashboard user />
-              | (None, _) => ReasonReact.nullElement
+              | (None, _) =>
+                <div className="App__landing">
+                  <button
+                    onClick=(_event => send(Login))
+                    className="Button Button--primary">
+                    (
+                      ReasonReact.stringToElement(
+                        "Connect With Youtube To Get Started",
+                      )
+                    )
+                  </button>
+                </div>
               }
             )
           </div>
