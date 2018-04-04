@@ -11,10 +11,13 @@
   padding: 0 20px;
 }
 
-.Comment__bulkActions {
-  display: flex;
+.Comment__publishedAt {
+  margin-bottom: 5px;
+  font-size: 12px;
+  color: #888;
 }
 
 .Comment__bulkActions {
+  display: flex;
   padding-right: 20px;
 }

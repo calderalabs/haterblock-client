@@ -2,6 +2,8 @@ open Belt;
 
 [%bs.raw {|require('./Comment.css')|}];
 
+open MomentRe;
+
 let component = ReasonReact.statelessComponent("Comment");
 
 let sentimentToEmoji = (sentiment: CommentData.Sentiment.t) =>
@@ -30,8 +32,8 @@ let make =
           <input
             name="markedForRejection"
             _type="checkbox"
-            checked=Js.Boolean.to_js_boolean(checked)
-            disabled=Js.Boolean.to_js_boolean(rejected)
+            checked=(Js.Boolean.to_js_boolean(checked))
+            disabled=(Js.Boolean.to_js_boolean(rejected))
             onChange=(_event => onChange())
           />
         </div>
@@ -39,6 +41,16 @@ let make =
           (ReasonReact.stringToElement(sentiment))
         </div>
         <div className="Comment__body">
+          <div className="Comment__publishedAt">
+            (
+              ReasonReact.stringToElement(
+                Moment.fromNow(
+                  comment.publishedAt,
+                  ~withoutSuffix=None,
+                ),
+              )
+            )
+          </div>
           <div dangerouslySetInnerHTML={"__html": comment.body} />
         </div>
         <div className="Comment__actions">
