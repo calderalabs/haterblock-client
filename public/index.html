@@ -31,7 +31,8 @@
   <script src="https://cdn.ravenjs.com/3.24.0/raven.min.js" crossorigin="anonymous"></script>
   <script>
     Raven.config('https://b7343238307e4f2ca34c42cb1a9788cc@sentry.io/1071585', {
-      ignoreUrls: [/localhost/]
+      ignoreUrls: [/localhost/],
+      environment: "%NODE_ENV%"
     }).install();
   </script>
   <script src="https://apis.google.com/js/api.js"></script>
