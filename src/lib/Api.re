@@ -2,17 +2,15 @@ open Belt;
 
 exception RequestFailed;
 
-[@bs.val] external environment : string = "process.env.NODE_ENV";
-
 let baseHost =
-  switch (environment) {
+  switch (Global.environment) {
   | "development" => "localhost:4000"
   | "production" => "api.gethaterblock.com"
   | _ => "localhost:4000"
   };
 
 let baseUrl =
-  switch (environment) {
+  switch (Global.environment) {
   | "development" => {j|http://$baseHost|j}
   | "production" => {j|https://$baseHost|j}
   | _ => {j|http://$baseHost|j}
@@ -59,6 +57,14 @@ let request =
       {j|$(path)?$(queryString)|j};
     | None => path
     };
+  let showError = () =>
+    switch (AppAlert.instance^) {
+    | None => ()
+    | Some(instance) =>
+      instance.ReasonReact.send(
+        SetMessage("Oops, something went wrong, please try that again."),
+      )
+    };
   Js.Promise.(
     Fetch.fetchWithInit(
       {j|$(baseUrl)$(fullPath)|j},
@@ -73,6 +79,12 @@ let request =
          if (Fetch.Response.ok(response)) {
            resolve(response);
          } else {
+           if (Fetch.Response.status(response) == 401) {
+             Global.clearLocalStorage();
+             Global.reload();
+           } else {
+             showError();
+           };
            switch (callback) {
            | Some(callback) =>
              callback(Error(Fetch.Response.statusText(response)))
@@ -89,12 +101,12 @@ let request =
          };
          resolve();
        })
-    |> catch(error => {
+    |> catch(_error => {
          switch (callback) {
          | Some(callback) => callback(Error(""))
          | None => ()
          };
-         Js.log(error);
+         showError();
          resolve();
        })
   )

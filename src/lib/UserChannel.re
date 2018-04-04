@@ -1,5 +1,3 @@
-[@bs.val] external environment : string = "process.env.NODE_ENV";
-
 type response;
 
 type payload = {
@@ -31,7 +29,7 @@ let join =
   let userId = user.id;
   let baseHost = Api.baseHost;
   let protocol =
-    switch (environment) {
+    switch (Global.environment) {
     | "production" => "wss://"
     | "development" => "ws://"
     | _ => "ws://"

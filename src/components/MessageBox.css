@@ -1,0 +1,20 @@
+.MessageBox {
+  display: flex;
+  justify-content: center;
+  margin: 50px 0;
+}
+
+.MessageBox__inner {
+  background-color: #f8f9fc;
+  border-radius: 5px;
+  border: 1px solid #d4e0e8;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
+  padding: 13px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.MessageBox__inner--alert {
+  background-color:#d63969;
+  color: #ffffff;
+}

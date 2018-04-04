@@ -55,19 +55,3 @@
   max-width: 1366px;
   margin: 0 auto;
 }
-
-.App__loadingMessageWrapper {
-  text-align: center;
-}
-
-.App__loadingMessage {
-  display: inline-block;
-  background-color: #f8f9fc;
-  border-radius: 5px;
-  border: 1px solid #d4e0e8;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
-  padding: 13px;
-  font-size: 13px;
-  font-weight: 500;
-  margin: 50px 0;
-}

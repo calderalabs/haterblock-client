@@ -8,22 +8,10 @@
   background-color: #f4f9fd;
 }
 
-.CommentList__emptyMessage {
-  background-color: #f8f9fc;
-  border-radius: 5px;
-  border: 1px solid #d4e0e8;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
-  padding: 13px;
-  font-size: 13px;
-  font-weight: 500;
-}
-
 .CommentList__emptyComments {
   background-color: #f4f9fd;
   display: flex;
-  min-height: 200px;
   justify-content: center;
-  align-items: center;
 }
 
 .CommentList__commentWrapper {

@@ -90,20 +90,23 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
             state.markedForRejection |> List.keep(_, id => comment.id != id) :
             [comment.id, ...state.markedForRejection];
         ReasonReact.Update({...state, markedForRejection});
-      | ToggleAllForRejection => {
-        let publishedComments = CommentData.Comment.publishedComments(state.comments);
-        let allCommentsMarkedForRejection = List.length(publishedComments) == List.length(state.markedForRejection);
-        let markedForRejection = if (allCommentsMarkedForRejection) {
-          []
-        } else {
-          publishedComments
-          |> List.reduce(_, state.markedForRejection, (acc, comment) =>
-               isMarkedForRejection(state.markedForRejection, comment) ?
-                 acc : List.add(acc, comment.id)
-             );
-        };
+      | ToggleAllForRejection =>
+        let publishedComments =
+          CommentData.Comment.publishedComments(state.comments);
+        let allCommentsMarkedForRejection =
+          List.length(publishedComments)
+          == List.length(state.markedForRejection);
+        let markedForRejection =
+          if (allCommentsMarkedForRejection) {
+            [];
+          } else {
+            publishedComments
+            |> List.reduce(_, state.markedForRejection, (acc, comment) =>
+                 isMarkedForRejection(state.markedForRejection, comment) ?
+                   acc : List.add(acc, comment.id)
+               );
+          };
         ReasonReact.Update({...state, markedForRejection});
-      }
       | CommentsLoaded(document) =>
         ReasonReact.Update({
           ...state,
@@ -132,19 +135,19 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
           switch (self.state.comments) {
           | None =>
             <div className="CommentList__emptyComments">
-              <div className="CommentList__emptyMessage">
+              <MessageBox>
                 (ReasonReact.stringToElement("Loading..."))
-              </div>
+              </MessageBox>
             </div>
           | Some([]) =>
             <div className="CommentList__emptyComments">
-              <div className="CommentList__emptyMessage">
+              <MessageBox>
                 (
                   ReasonReact.stringToElement(
                     "There are no comments to display",
                   )
                 )
-              </div>
+              </MessageBox>
             </div>
           | Some(comments) =>
             <div className="CommentList__comments">

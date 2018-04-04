@@ -37,4 +37,4 @@ let login = (callback: Callback.t(unit, unit)) =>
     }
   );
 
-let logout = () => Dom.Storage.(removeItem("token", localStorage));
+let logout = () => Global.clearLocalStorage();

@@ -106,14 +106,13 @@ let make = _children => {
         </div>
         <div className="App__content">
           <div className="App__contentInner">
+            <AppAlert />
             (
               switch (state.currentUser, state.loadingMessage) {
               | (_, Some(loadingMessage)) =>
-                <div className="App__loadingMessageWrapper">
-                  <div className="App__loadingMessage">
-                    (ReasonReact.stringToElement(loadingMessage))
-                  </div>
-                </div>
+                <MessageBox>
+                  (ReasonReact.stringToElement(loadingMessage))
+                </MessageBox>
               | (Some(user), None) => <Dashboard user />
               | (None, _) => ReasonReact.nullElement
               }
