@@ -53,11 +53,9 @@ let make = (~user: UserData.User.t, _children) => {
     <div className="Dashboard">
       (
         if (state.syncedAt == None) {
-          <div className="App__loadingMessageWrapper">
-            <div className="App__loadingMessage">
-              (ReasonReact.stringToElement("Syncing..."))
-            </div>
-          </div>;
+          <MessageBox>
+            (ReasonReact.stringToElement("Syncing..."))
+          </MessageBox>;
         } else {
           <div>
             (
