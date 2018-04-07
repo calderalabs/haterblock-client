@@ -69,7 +69,7 @@ let make = _children => {
       | Logout =>
         ReasonReact.UpdateWithSideEffects(
           {...state, currentUser: None},
-          ((_) => Session.logout()),
+          ((_) => Global.clearSessionToken()),
         )
       },
     render: ({state, send}) =>

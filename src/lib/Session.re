@@ -10,12 +10,15 @@ let persistToken = (callback: Callback.t(unit, unit), json: Js.Json.t) =>
   |> decode
   |> (
     session => {
-      Dom.Storage.(setItem("token", session.token, localStorage));
+      Dom.Storage.(
+        setItem(Global.sessionTokenKey, session.token, localStorage)
+      );
       callback(Success());
     }
   );
 
-let getToken = () => Dom.Storage.(getItem("token", localStorage));
+let getToken = () =>
+  Dom.Storage.(getItem(Global.sessionTokenKey, localStorage));
 
 let login = (callback: Callback.t(unit, unit)) =>
   Gapi.grantOfflineAccess(response =>
@@ -36,5 +39,3 @@ let login = (callback: Callback.t(unit, unit)) =>
       )
     }
   );
-
-let logout = () => Global.clearLocalStorage();
