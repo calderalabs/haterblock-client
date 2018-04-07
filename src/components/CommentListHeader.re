@@ -12,21 +12,23 @@ let make =
       ~onPageChange: int => unit,
       ~onRejectMarked: Callback.action(unit, unit),
       ~markedForRejection: list(Model.id),
+      ~showRejected: bool,
       ~onSelectAll: unit => unit,
+      ~onToggleShowRejected: unit => unit,
       _children,
     ) => {
   let publishedComments = CommentData.Comment.publishedComments(comments);
   let publishedCommentsExist = List.length(publishedComments) != 0;
   let allCommentsMarkedForRejection =
-    List.length(publishedComments) == List.length(markedForRejection);
+    List.length(markedForRejection) != 0
+    && List.length(publishedComments) == List.length(markedForRejection);
   {
     ...component,
     render: _self =>
       <div className="CommentListHeader">
         (
           switch (comments) {
-          | None
-          | Some([]) => ReasonReact.nullElement
+          | None => ReasonReact.nullElement
           | Some(_) =>
             <div className="CommentListHeader__bulkActions">
               <div className="CommentListHeader__bulkActionsSelect">
@@ -51,18 +53,28 @@ let make =
             </div>
           }
         )
-        <div className="CommentListHeader__title">
-          (ReasonReact.stringToElement("Comments"))
-        </div>
         <div>
           (
             switch (comments) {
-            | None
-            | Some([]) => ReasonReact.nullElement
+            | None => ReasonReact.nullElement
             | Some(comments) =>
               let totalEntries = totalEntries;
               let count = comments |> List.length;
               <div className="CommentListHeader__nav">
+                <div className="CommentListHeader__filters">
+                  <input
+                    name="showRejected"
+                    id="showRejected"
+                    _type="checkbox"
+                    checked=(Js.Boolean.to_js_boolean(showRejected))
+                    onChange=(_event => onToggleShowRejected())
+                  />
+                  <label
+                    className="CommentListHeader__filtersLabel"
+                    htmlFor="showRejected">
+                    (ReasonReact.stringToElement("Show Rejected"))
+                  </label>
+                </div>
                 <div className="CommentListHeader__count">
                   (
                     ReasonReact.stringToElement(

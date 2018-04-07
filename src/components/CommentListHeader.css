@@ -7,22 +7,16 @@
   padding: 16px 20px;
   align-items: center;
   min-height: 30px;
-}
-
-.CommentListHeader__title {
-  flex-grow: 1;
-  font-weight: bold;
+  justify-content: space-between;
 }
 
 .CommentListHeader__count {
   font-size: 13px;
-  display: inline-block;
   margin-right: 5px;
 }
 
 .CommentListHeader__pagination {
   list-style-type: none;
-  display: inline-block;
   padding-left: 0;
   margin: 0;
 }
@@ -37,10 +31,12 @@
 }
 
 .CommentListHeader__nav {
-  text-align: right;
+  display: flex;
+  flex-grow: 1;
+  align-items: baseline;
 }
 
-.CommentListHeader__nav, .CommentListHeader__bulkActions {
+.CommentListHeader__bulkActions {
   width: 300px;
 }
 
@@ -60,4 +56,13 @@
 
 .CommentListHeader__paginationItem--active .CommentListHeader__paginationLink, .CommentListHeader__paginationLink:hover {
   background-color: #E7EEF3;
+}
+
+.CommentListHeader__filters {
+  display: flex;
+  align-items: baseline;
+}
+
+.CommentListHeader__filtersLabel {
+  padding: 0 10px;
 }

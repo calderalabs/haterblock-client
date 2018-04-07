@@ -108,12 +108,20 @@ module Comment = {
 let fetchAll =
     (
       ~page=1,
+      ~rejected=false,
       callback: Callback.t(JsonApi.Document.decodedMany(Comment.t), unit),
-    ) =>
+    ) => {
+  let baseQuery = [("page", string_of_int(page))];
+  let query =
+    if (rejected) {
+      [("rejected", "true"), ...baseQuery];
+    } else {
+      baseQuery;
+    };
   Api.request(
     ~method=Fetch.Get,
     ~path="/comments",
-    ~query=[("page", string_of_int(page))],
+    ~query,
     ~callback=
       response =>
         switch (response) {
@@ -122,6 +130,7 @@ let fetchAll =
         },
     (),
   );
+};
 
 let rejectAll = (callback: Callback.t(unit, unit), ids: list(Model.id)) =>
   Api.request(

@@ -7,13 +7,15 @@ type state = {
   totalPages: int,
   totalEntries: int,
   markedForRejection: list(Model.id),
+  showRejected: bool,
 };
 
 type action =
   | Reject(list(CommentData.Comment.t), unit => unit)
   | ToggleForRejection(CommentData.Comment.t)
   | CommentsLoaded(JsonApi.Document.decodedMany(CommentData.Comment.t))
-  | ToggleAllForRejection;
+  | ToggleAllForRejection
+  | ToggleShowRejected;
 
 let component = ReasonReact.reducerComponent("CommentList");
 
@@ -54,8 +56,8 @@ let make = _children => {
   let isMarkedForRejection =
       (markedForRejection: list(Model.id), comment: CommentData.Comment.t) =>
     markedForRejection |> List.has(_, comment.id, (==));
-  let loadComments = (~page=1, {ReasonReact.send}) =>
-    CommentData.fetchAll(~page, response =>
+  let loadComments = (~rejected=false, ~page=1, {ReasonReact.send}) =>
+    CommentData.fetchAll(~rejected, ~page, response =>
       switch (response) {
       | Success(document) => send(CommentsLoaded(document))
       | Error () => ()
@@ -68,6 +70,7 @@ let make = _children => {
       markedForRejection: [],
       totalPages: 0,
       totalEntries: 0,
+      showRejected: false,
     },
     reducer: (action, state) =>
       switch (action) {
@@ -114,6 +117,18 @@ let make = _children => {
           totalPages: document.meta.totalPages,
           totalEntries: document.meta.totalEntries,
         })
+      | ToggleShowRejected =>
+        if (state.showRejected) {
+          ReasonReact.UpdateWithSideEffects(
+            {...state, showRejected: false},
+            (self => loadComments(self, ~rejected=false)),
+          );
+        } else {
+          ReasonReact.UpdateWithSideEffects(
+            {...state, showRejected: true},
+            (self => loadComments(self, ~rejected=true)),
+          );
+        }
       },
     didMount: self => {
       loadComments(self);
@@ -128,7 +143,9 @@ let make = _children => {
           totalEntries=self.state.totalEntries
           totalPages=self.state.totalPages
           markedForRejection=self.state.markedForRejection
+          showRejected=self.state.showRejected
           onSelectAll=(() => self.send(ToggleAllForRejection))
+          onToggleShowRejected=(() => self.send(ToggleShowRejected))
         />
         (
           switch (self.state.comments) {
