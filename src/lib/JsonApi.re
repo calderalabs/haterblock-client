@@ -44,6 +44,19 @@ module Document = {
   };
 };
 
+module Error = {
+  type t = {
+    code: string,
+    title: string,
+  };
+  let decodeOne = (json: Js.Json.t) => {
+    code: json |> field("code", string),
+    title: json |> field("title", string),
+  };
+  let decodeMany = (json: Js.Json.t) =>
+    json |> field("errors", list(decodeOne));
+};
+
 module type Decodable = {
   type t;
   type attributes;

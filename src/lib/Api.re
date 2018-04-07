@@ -1,6 +1,8 @@
 open Belt;
 
-exception RequestFailed;
+type error =
+  | Unknown(string)
+  | Request(list(JsonApi.Error.t));
 
 let baseHost =
   switch (Global.environment) {
@@ -36,7 +38,7 @@ let request =
     (
       ~method: Fetch.requestMethod,
       ~path: string,
-      ~callback: option(Callback.t(Js.Json.t, string))=?,
+      ~callback: option(Callback.t(Js.Json.t, error))=?,
       ~body: option(list((string, Js.Json.t)))=?,
       ~query: option(list((string, string)))=?,
       (),
@@ -57,7 +59,7 @@ let request =
       {j|$(path)?$(queryString)|j};
     | None => path
     };
-  let showError = () =>
+  let showError = _error =>
     switch (AppAlert.instance^) {
     | None => ()
     | Some(instance) =>
@@ -76,37 +78,38 @@ let request =
       ),
     )
     |> then_(response =>
-         if (Fetch.Response.ok(response)) {
-           resolve(response);
-         } else {
-           if (Fetch.Response.status(response) == 401) {
-             Global.clearLocalStorage();
-             Global.reload();
-           } else {
-             showError();
-           };
-           switch (callback) {
-           | Some(callback) =>
-             callback(Error(Fetch.Response.statusText(response)))
-           | None => ()
-           };
-           reject(RequestFailed);
-         }
+         response
+         |> Fetch.Response.json
+         |> then_(json => {
+              if (response |> Fetch.Response.ok) {
+                switch (callback) {
+                | Some(callback) => callback(Success(json))
+                | None => ()
+                };
+              } else {
+                let errors = json |> JsonApi.Error.decodeMany;
+                let error = Request(errors);
+                if (errors |> List.some(_, error => error.code == "401")) {
+                  Global.clearSessionToken();
+                  Global.reload();
+                } else {
+                  error |> showError;
+                };
+                switch (callback) {
+                | Some(callback) => callback(Error(error))
+                | None => ()
+                };
+              };
+              resolve();
+            })
        )
-    |> then_(Fetch.Response.json)
-    |> then_(json => {
+    |> catch(error => {
+         let error = Unknown(Obj.magic(error)##toString());
          switch (callback) {
-         | Some(callback) => callback(Success(json))
+         | Some(callback) => callback(Error(error))
          | None => ()
          };
-         resolve();
-       })
-    |> catch(_error => {
-         switch (callback) {
-         | Some(callback) => callback(Error(""))
-         | None => ()
-         };
-         showError();
+         error |> showError;
          resolve();
        })
   )

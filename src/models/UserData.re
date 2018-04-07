@@ -44,7 +44,7 @@ module User = {
     );
 };
 
-let fetch = (callback: Callback.t(User.t, string)) =>
+let fetch = (callback: Callback.t(User.t, Api.error)) =>
   Api.request(
     ~method=Fetch.Get,
     ~path="/users/me",

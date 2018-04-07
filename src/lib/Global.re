@@ -3,4 +3,7 @@
 [@bs.val] [@bs.scope "window.location"]
 external reload : unit => unit = "reload";
 
-let clearLocalStorage = () => Dom.Storage.(removeItem("token", localStorage));
+let sessionTokenKey = "token";
+
+let clearSessionToken = () =>
+  Dom.Storage.(removeItem(sessionTokenKey, localStorage));
