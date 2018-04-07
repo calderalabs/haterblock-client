@@ -74,9 +74,7 @@ let make = (~user: UserData.User.t, _children) => {
                 ReasonReact.nullElement;
               }
             )
-            <CommentList sentiment=Negative />
-            <CommentList sentiment=Neutral />
-            <CommentList sentiment=Positive />
+            <CommentList />
           </div>;
         }
       )

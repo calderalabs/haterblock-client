@@ -9,7 +9,6 @@ let make =
       ~comments: option(list(CommentData.Comment.t)),
       ~totalEntries: int,
       ~totalPages: int,
-      ~sentiment: CommentData.Sentiment.t,
       ~onPageChange: int => unit,
       ~onRejectMarked: Callback.action(unit, unit),
       ~markedForRejection: list(Model.id),
@@ -18,7 +17,8 @@ let make =
     ) => {
   let publishedComments = CommentData.Comment.publishedComments(comments);
   let publishedCommentsExist = List.length(publishedComments) != 0;
-  let allCommentsMarkedForRejection = List.length( publishedComments) == List.length(markedForRejection);
+  let allCommentsMarkedForRejection =
+    List.length(publishedComments) == List.length(markedForRejection);
   {
     ...component,
     render: _self =>
@@ -52,11 +52,7 @@ let make =
           }
         )
         <div className="CommentListHeader__title">
-          (
-            ReasonReact.stringToElement(
-              CommentData.Sentiment.toString(sentiment),
-            )
-          )
+          (ReasonReact.stringToElement("Comments"))
         </div>
         <div>
           (

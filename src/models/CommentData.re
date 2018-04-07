@@ -107,17 +107,13 @@ module Comment = {
 
 let fetchAll =
     (
-      ~sentiment=Sentiment.Positive,
       ~page=1,
       callback: Callback.t(JsonApi.Document.decodedMany(Comment.t), unit),
     ) =>
   Api.request(
     ~method=Fetch.Get,
     ~path="/comments",
-    ~query=[
-      ("sentiment", Sentiment.encode(sentiment)),
-      ("page", string_of_int(page)),
-    ],
+    ~query=[("page", string_of_int(page))],
     ~callback=
       response =>
         switch (response) {

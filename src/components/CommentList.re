@@ -17,7 +17,7 @@ type action =
 
 let component = ReasonReact.reducerComponent("CommentList");
 
-let make = (~sentiment: CommentData.Sentiment.t, _children) => {
+let make = _children => {
   let reject =
       (
         comment: CommentData.Comment.t,
@@ -55,7 +55,7 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
       (markedForRejection: list(Model.id), comment: CommentData.Comment.t) =>
     markedForRejection |> List.has(_, comment.id, (==));
   let loadComments = (~page=1, {ReasonReact.send}) =>
-    CommentData.fetchAll(~sentiment, ~page, response =>
+    CommentData.fetchAll(~page, response =>
       switch (response) {
       | Success(document) => send(CommentsLoaded(document))
       | Error () => ()
@@ -128,7 +128,6 @@ let make = (~sentiment: CommentData.Sentiment.t, _children) => {
           totalEntries=self.state.totalEntries
           totalPages=self.state.totalPages
           markedForRejection=self.state.markedForRejection
-          sentiment
           onSelectAll=(() => self.send(ToggleAllForRejection))
         />
         (
