@@ -120,12 +120,12 @@ let make = _children => {
       | ToggleShowRejected =>
         if (state.showRejected) {
           ReasonReact.UpdateWithSideEffects(
-            {...state, showRejected: false},
+            {...state, comments: None, showRejected: false},
             (self => loadComments(self, ~rejected=false)),
           );
         } else {
           ReasonReact.UpdateWithSideEffects(
-            {...state, showRejected: true},
+            {...state, comments: None, showRejected: true},
             (self => loadComments(self, ~rejected=true)),
           );
         }
