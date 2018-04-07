@@ -21,7 +21,6 @@ module Status = {
 
 module Sentiment = {
   type t =
-    | Hateful
     | Negative
     | Neutral
     | Positive;
@@ -31,7 +30,6 @@ module Sentiment = {
     | "positive" => Positive
     | "neutral" => Neutral
     | "negative" => Negative
-    | "hateful" => Hateful
     | _ => raise(InvalidSentiment)
     };
   let encode = (sentiment: t) =>
@@ -39,14 +37,12 @@ module Sentiment = {
     | Positive => "positive"
     | Neutral => "neutral"
     | Negative => "negative"
-    | Hateful => "hateful"
     };
   let toString = (sentiment: t) =>
     switch (sentiment) {
     | Positive => "Positive"
     | Neutral => "Neutral"
     | Negative => "Negative"
-    | Hateful => "Hateful"
     };
 };
 

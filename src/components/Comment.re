@@ -8,7 +8,6 @@ let component = ReasonReact.statelessComponent("Comment");
 
 let sentimentToEmoji = (sentiment: CommentData.Sentiment.t) =>
   switch (sentiment) {
-  | Hateful => {js|😡|js}
   | Negative => {js|😠|js}
   | Neutral => {js|😐|js}
   | Positive => {js|🙂|js}
@@ -44,10 +43,7 @@ let make =
           <div className="Comment__publishedAt">
             (
               ReasonReact.stringToElement(
-                Moment.fromNow(
-                  comment.publishedAt,
-                  ~withoutSuffix=None,
-                ),
+                Moment.fromNow(comment.publishedAt, ~withoutSuffix=None),
               )
             )
           </div>
