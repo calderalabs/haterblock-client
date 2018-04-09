@@ -65,11 +65,9 @@ let make = (~user: UserData.User.t, _children) => {
                   state.newCommentCount == 1 ?
                     "There is 1 new comment, refresh the page to see it." :
                     {j|There are $count new comments, refresh the page to see them.|j};
-                <div className="App__loadingMessageWrapper">
-                  <div className="App__loadingMessage">
-                    (ReasonReact.stringToElement(message))
-                  </div>
-                </div>;
+                <MessageBox>
+                  (ReasonReact.stringToElement(message))
+                </MessageBox>;
               } else {
                 ReasonReact.nullElement;
               }
