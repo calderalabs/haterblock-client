@@ -6,7 +6,7 @@ let component = ReasonReact.statelessComponent("CommentListHeader");
 
 let make =
     (
-      ~comments: option(list(CommentData.Comment.t)),
+      ~comments: list(CommentData.Comment.t),
       ~totalEntries: int,
       ~totalPages: int,
       ~onPageChange: int => unit,
@@ -22,11 +22,7 @@ let make =
   let allCommentsMarkedForRejection =
     List.length(markedForRejection) != 0
     && List.length(publishedComments) == List.length(markedForRejection);
-  let count =
-    switch (comments) {
-    | None => 0
-    | Some(comments) => comments |> List.length
-    };
+  let count = comments |> List.length;
   {
     ...component,
     render: _self =>

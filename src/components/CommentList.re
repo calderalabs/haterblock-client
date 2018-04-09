@@ -3,9 +3,8 @@ open Belt;
 [%bs.raw {|require('./CommentList.css')|}];
 
 type state = {
-  comments: option(list(CommentData.Comment.t)),
-  totalPages: int,
-  totalEntries: int,
+  comments: list(CommentData.Comment.t),
+  response: option(CommentData.response),
   markedForRejection: list(Model.id),
   showRejected: bool,
 };
@@ -13,7 +12,7 @@ type state = {
 type action =
   | Reject(list(CommentData.Comment.t), unit => unit)
   | ToggleForRejection(CommentData.Comment.t)
-  | CommentsLoaded(JsonApi.Document.decodedMany(CommentData.Comment.t))
+  | CommentsLoaded(CommentData.response)
   | ToggleAllForRejection
   | ToggleShowRejected;
 
@@ -35,9 +34,8 @@ let make = _children => {
        );
   let rejectMarked = (self, callback: Callback.t(unit, unit)) =>
     switch (self.ReasonReact.state.comments) {
-    | None
-    | Some([]) => callback(Success())
-    | Some(comments) =>
+    | [] => callback(Success())
+    | comments =>
       let markedForRejection = self.ReasonReact.state.markedForRejection;
       markedForRejection
       |> CommentData.rejectAll(response =>
@@ -58,35 +56,27 @@ let make = _children => {
     markedForRejection |> List.has(_, comment.id, (==));
   let loadComments = (~rejected=false, ~page=1, {ReasonReact.send}) =>
     CommentData.fetchAll(~rejected, ~page, response =>
-      switch (response) {
-      | Success(document) => send(CommentsLoaded(document))
-      | Error () => ()
-      }
+      send(CommentsLoaded(response))
     );
   {
     ...component,
     initialState: () => {
-      comments: None,
+      comments: [],
+      response: None,
       markedForRejection: [],
-      totalPages: 0,
-      totalEntries: 0,
       showRejected: false,
     },
     reducer: (action, state) =>
       switch (action) {
       | Reject(rejectedComments, callback) =>
-        switch (state.comments) {
-        | Some(comments) =>
-          let updateComment = comment =>
-            rejectedComments |> List.has(_, comment, (==)) ?
-              {...comment, status: Rejected} : comment;
-          let updatedComments = comments |> List.map(_, updateComment);
-          ReasonReact.UpdateWithSideEffects(
-            {...state, comments: Some(updatedComments)},
-            (_self => callback()),
-          );
-        | None => ReasonReact.NoUpdate
-        }
+        let updateComment = comment =>
+          rejectedComments |> List.has(_, comment, (==)) ?
+            {...comment, status: Rejected} : comment;
+        let updatedComments = state.comments |> List.map(_, updateComment);
+        ReasonReact.UpdateWithSideEffects(
+          {...state, comments: updatedComments},
+          (_self => callback()),
+        );
       | ToggleForRejection(comment) =>
         let markedForRejection =
           isMarkedForRejection(state.markedForRejection, comment) ?
@@ -110,22 +100,30 @@ let make = _children => {
                );
           };
         ReasonReact.Update({...state, markedForRejection});
-      | CommentsLoaded(document) =>
-        ReasonReact.Update({
-          ...state,
-          comments: Some(document.resources),
-          totalPages: document.meta.totalPages,
-          totalEntries: document.meta.totalEntries,
-        })
+      | CommentsLoaded(response) =>
+        switch (response) {
+        | Success(document) =>
+          ReasonReact.Update({
+            ...state,
+            response: Some(response),
+            comments: document.resources,
+          })
+        | Error () =>
+          ReasonReact.Update({
+            ...state,
+            response: Some(response),
+            comments: [],
+          })
+        }
       | ToggleShowRejected =>
         if (state.showRejected) {
           ReasonReact.UpdateWithSideEffects(
-            {...state, comments: None, showRejected: false},
+            {...state, comments: [], response: None, showRejected: false},
             (self => loadComments(self, ~rejected=false)),
           );
         } else {
           ReasonReact.UpdateWithSideEffects(
-            {...state, comments: None, showRejected: true},
+            {...state, comments: [], response: None, showRejected: true},
             (self => loadComments(self, ~rejected=true)),
           );
         }
@@ -135,67 +133,80 @@ let make = _children => {
       ReasonReact.NoUpdate;
     },
     render: self =>
-      <div className="CommentList">
-        <CommentListHeader
-          comments=self.state.comments
-          onRejectMarked=(rejectMarked(self))
-          onPageChange=(page => loadComments(self, ~page))
-          totalEntries=self.state.totalEntries
-          totalPages=self.state.totalPages
-          markedForRejection=self.state.markedForRejection
-          showRejected=self.state.showRejected
-          onSelectAll=(() => self.send(ToggleAllForRejection))
-          onToggleShowRejected=(() => self.send(ToggleShowRejected))
-        />
-        (
-          switch (self.state.comments) {
-          | None =>
-            <div className="CommentList__emptyComments">
-              <MessageBox>
-                (ReasonReact.stringToElement("Loading..."))
-              </MessageBox>
-            </div>
-          | Some([]) =>
-            <div className="CommentList__emptyComments">
-              <MessageBox>
-                (
-                  ReasonReact.stringToElement(
-                    "There are no comments to display",
+      switch (self.state.response) {
+      | Some(Error ()) => ReasonReact.nullElement
+      | _ =>
+        let (totalEntries, totalPages) =
+          switch (self.state.response) {
+          | Some(Success(document)) => (
+              document.meta.totalEntries,
+              document.meta.totalPages,
+            )
+          | _ => (0, 0)
+          };
+        <div className="CommentList">
+          <CommentListHeader
+            comments=self.state.comments
+            onRejectMarked=(rejectMarked(self))
+            onPageChange=(page => loadComments(self, ~page))
+            totalEntries
+            totalPages
+            markedForRejection=self.state.markedForRejection
+            showRejected=self.state.showRejected
+            onSelectAll=(() => self.send(ToggleAllForRejection))
+            onToggleShowRejected=(() => self.send(ToggleShowRejected))
+          />
+          (
+            switch (self.state.comments, self.state.response) {
+            | (_, None) =>
+              <div className="CommentList__emptyComments">
+                <MessageBox>
+                  (ReasonReact.stringToElement("Loading..."))
+                </MessageBox>
+              </div>
+            | ([], _) =>
+              <div className="CommentList__emptyComments">
+                <MessageBox>
+                  (
+                    ReasonReact.stringToElement(
+                      "There are no comments to display",
+                    )
                   )
-                )
-              </MessageBox>
-            </div>
-          | Some(comments) =>
-            <div className="CommentList__comments">
-              (
-                comments
-                |> List.map(_, comment =>
-                     CommentData.Comment.(
-                       <div
-                         key=(string_of_int(comment.id))
-                         className="CommentList__commentWrapper">
-                         <Comment
-                           comment
-                           onReject=(reject(comment, self))
-                           checked=(
-                             isMarkedForRejection(
-                               self.state.markedForRejection,
-                               comment,
+                </MessageBox>
+              </div>
+            | (comments, _) =>
+              <div className="CommentList__comments">
+                (
+                  comments
+                  |> List.map(_, comment =>
+                       CommentData.Comment.(
+                         <div
+                           key=(string_of_int(comment.id))
+                           className="CommentList__commentWrapper">
+                           <Comment
+                             comment
+                             onReject=(reject(comment, self))
+                             checked=(
+                               isMarkedForRejection(
+                                 self.state.markedForRejection,
+                                 comment,
+                               )
                              )
-                           )
-                           onChange=(
-                             () => self.send(ToggleForRejection(comment))
-                           )
-                         />
-                       </div>
+                             onChange=(
+                               () => self.send(ToggleForRejection(comment))
+                             )
+                           />
+                         </div>
+                       )
                      )
-                   )
-                |> List.toArray
-                |> ReasonReact.arrayToElement
-              )
-            </div>
-          }
-        )
-      </div>,
+                  |> List.toArray
+                  |> ReasonReact.arrayToElement
+                )
+              </div>
+            | _ => ReasonReact.nullElement
+            }
+          )
+        </div>;
+      },
   };
 };

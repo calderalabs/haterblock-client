@@ -97,13 +97,12 @@ module Comment = {
         let toModel = (record: t) : Model.t => {id: record.id};
       },
     );
-  let publishedComments = (comments: option(list(t))) =>
-    switch (comments) {
-    | None => []
-    | Some(comments) =>
-      comments |> List.keep(_, comment => comment.status == Published)
-    };
+  let publishedComments = (comments: list(t)) =>
+    comments |> List.keep(_, comment => comment.status == Published);
 };
+
+type response =
+  Callback.response(JsonApi.Document.decodedMany(Comment.t), unit);
 
 let fetchAll =
     (
