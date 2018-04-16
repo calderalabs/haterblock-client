@@ -21,15 +21,13 @@ let make = _children => {
     switch (Session.getToken()) {
     | None => send(Loaded)
     | Some(_) =>
-      UserData.fetch(
-        (
-          user => {
-            send(UserLoaded(user));
-            send(Loaded);
-          }
-        )
-        |> Callback.ignoreError,
-      )
+      UserData.fetch(response => {
+        switch (response) {
+        | Success(user) => send(UserLoaded(user))
+        | Error(_) => ()
+        };
+        send(Loaded);
+      })
     };
   let login = ({ReasonReact.send}) => {
     send(Loading("Logging in..."));
