@@ -11,7 +11,7 @@
 }
 
 .CommentListHeader__count {
-  font-size: 13px;
+  font-size: 14px;
   margin-right: 5px;
 }
 
@@ -56,13 +56,4 @@
 
 .CommentListHeader__paginationItem--active .CommentListHeader__paginationLink, .CommentListHeader__paginationLink:hover {
   background-color: #E7EEF3;
-}
-
-.CommentListHeader__filters {
-  display: flex;
-  align-items: baseline;
-}
-
-.CommentListHeader__filtersLabel {
-  padding: 0 10px;
 }

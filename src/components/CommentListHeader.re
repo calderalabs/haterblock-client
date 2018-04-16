@@ -12,9 +12,7 @@ let make =
       ~onPageChange: int => unit,
       ~onRejectMarked: Callback.action(unit, unit),
       ~markedForRejection: list(Model.id),
-      ~showRejected: bool,
       ~onSelectAll: unit => unit,
-      ~onToggleShowRejected: unit => unit,
       _children,
     ) => {
   let publishedComments = CommentData.Comment.publishedComments(comments);
@@ -48,20 +46,6 @@ let make =
         </div>
         <div>
           <div className="CommentListHeader__nav">
-            <div className="CommentListHeader__filters">
-              <input
-                name="showRejected"
-                id="showRejected"
-                _type="checkbox"
-                checked=(Js.Boolean.to_js_boolean(showRejected))
-                onChange=(_event => onToggleShowRejected())
-              />
-              <label
-                className="CommentListHeader__filtersLabel"
-                htmlFor="showRejected">
-                (ReasonReact.stringToElement("Show Rejected"))
-              </label>
-            </div>
             <div className="CommentListHeader__count">
               (
                 ReasonReact.stringToElement(

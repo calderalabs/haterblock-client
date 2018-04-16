@@ -9,6 +9,13 @@ module Status = {
     | HeldForReview
     | Rejected
     | LikelySpam;
+  let encode = (status: t) =>
+    switch (status) {
+    | Published => "published"
+    | HeldForReview => "heldForReview"
+    | Rejected => "rejected"
+    | LikelySpam => "likelySpam"
+    };
   let decode = (status: string) =>
     switch (status) {
     | "published" => Published
@@ -107,16 +114,25 @@ type response =
 let fetchAll =
     (
       ~page=1,
-      ~rejected=false,
+      ~status: list(Status.t),
+      ~sentiment: list(Sentiment.t),
       callback: Callback.t(JsonApi.Document.decodedMany(Comment.t), unit),
     ) => {
-  let baseQuery = [("page", string_of_int(page))];
-  let query =
-    if (rejected) {
-      [("rejected", "true"), ...baseQuery];
-    } else {
-      baseQuery;
-    };
+  let query = [
+    ("page", string_of_int(page)),
+    (
+      "status",
+      status
+      |> List.map(_, status => Status.encode(status))
+      |> String.concat(","),
+    ),
+    (
+      "sentiment",
+      sentiment
+      |> List.map(_, sentiment => Sentiment.encode(sentiment))
+      |> String.concat(","),
+    ),
+  ];
   Api.request(
     ~method=Fetch.Get,
     ~path="/comments",

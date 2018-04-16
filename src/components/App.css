@@ -23,6 +23,7 @@
   right: 0;
   bottom: 0;
   overflow: auto;
+  font-size: 16px;
 }
 
 .App__headerItems {

@@ -6,7 +6,7 @@ type state = {
   comments: list(CommentData.Comment.t),
   response: option(CommentData.response),
   markedForRejection: list(Model.id),
-  showRejected: bool,
+  filters: CommentListFilters.filters,
 };
 
 type action =
@@ -14,7 +14,7 @@ type action =
   | ToggleForRejection(CommentData.Comment.t)
   | CommentsLoaded(CommentData.response)
   | ToggleAllForRejection
-  | ToggleShowRejected;
+  | SetFilters(CommentListFilters.filters);
 
 let component = ReasonReact.reducerComponent("CommentList");
 
@@ -54,8 +54,9 @@ let make = _children => {
   let isMarkedForRejection =
       (markedForRejection: list(Model.id), comment: CommentData.Comment.t) =>
     markedForRejection |> List.has(_, comment.id, (==));
-  let loadComments = (~rejected=false, ~page=1, {ReasonReact.send}) =>
-    CommentData.fetchAll(~rejected, ~page, response =>
+  let loadComments =
+      (~page=1, {ReasonReact.send, state}) =>
+    CommentData.fetchAll(~status=state.filters.status, ~sentiment=state.filters.sentiment, ~page, response =>
       send(CommentsLoaded(response))
     );
   {
@@ -64,7 +65,10 @@ let make = _children => {
       comments: [],
       response: None,
       markedForRejection: [],
-      showRejected: false,
+      filters: {
+        status: [Published],
+        sentiment: [Negative],
+      },
     },
     reducer: (action, state) =>
       switch (action) {
@@ -115,18 +119,10 @@ let make = _children => {
             comments: [],
           })
         }
-      | ToggleShowRejected =>
-        if (state.showRejected) {
-          ReasonReact.UpdateWithSideEffects(
-            {...state, comments: [], response: None, showRejected: false},
-            (self => loadComments(self, ~rejected=false)),
-          );
-        } else {
-          ReasonReact.UpdateWithSideEffects(
-            {...state, comments: [], response: None, showRejected: true},
-            (self => loadComments(self, ~rejected=true)),
-          );
-        }
+      | SetFilters(filters) => ReasonReact.UpdateWithSideEffects(
+        {...state, comments: [], response: None, filters},
+        (self => loadComments(self)),
+      )
       },
     didMount: self => {
       loadComments(self);
@@ -152,9 +148,11 @@ let make = _children => {
             totalEntries
             totalPages
             markedForRejection=self.state.markedForRejection
-            showRejected=self.state.showRejected
             onSelectAll=(() => self.send(ToggleAllForRejection))
-            onToggleShowRejected=(() => self.send(ToggleShowRejected))
+          />
+          <CommentListFilters
+            filters=self.state.filters
+            onFiltersChange=(filters => self.send(SetFilters(filters)))
           />
           (
             switch (self.state.comments, self.state.response) {
