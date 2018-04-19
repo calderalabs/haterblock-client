@@ -15,6 +15,12 @@
   margin-right: 5px;
 }
 
+@media (max-width: 600px)  {
+  .CommentListHeader__count {
+    display: none
+  }
+}
+
 .CommentListHeader__pagination {
   list-style-type: none;
   padding-left: 0;
@@ -37,7 +43,7 @@
 }
 
 .CommentListHeader__bulkActions {
-  width: 300px;
+  width: 130px;
 }
 
 .CommentListHeader__paginationLink {
