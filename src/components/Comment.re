@@ -48,6 +48,17 @@ let make =
               )
             )
           </div>
+          (
+            switch (comment.videoId) {
+            | None => ReasonReact.nullElement
+            | Some(videoId) =>
+              <div className="Comment__video">
+                <a href={j|https://youtube.com/watch?v=$videoId|j}>
+                  (ReasonReact.stringToElement("Go to video"))
+                </a>
+              </div>
+            }
+          )
           <div dangerouslySetInnerHTML={"__html": comment.body} />
         </div>
         <div className="Comment__actions">

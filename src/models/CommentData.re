@@ -64,6 +64,7 @@ module Comment = {
     sentiment: Sentiment.t,
     status: Status.t,
     publishedAt: Moment.t,
+    videoId: option(string),
   };
   include
     JsonApi.MakeDecoder(
@@ -74,6 +75,7 @@ module Comment = {
           sentiment: string,
           status: string,
           publishedAt: Moment.t,
+          videoId: option(string),
         };
         let attributesDecoder = (json: Js.Json.t) : attributes =>
           Json.Decode.{
@@ -81,6 +83,7 @@ module Comment = {
             sentiment: json |> field("sentiment", string),
             status: json |> field("status", string),
             publishedAt: json |> field("published_at", string) |> moment,
+            videoId: json |> optional(field("video_id", string)),
           };
         let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : t =>
           switch (resource.attributes) {
@@ -90,6 +93,7 @@ module Comment = {
               sentiment: Neutral,
               status: Published,
               publishedAt: momentNow(),
+              videoId: None,
             }
           | Some(attributes) => {
               id: resource.id,
@@ -97,6 +101,7 @@ module Comment = {
               sentiment: Sentiment.decode(attributes.sentiment),
               status: Status.decode(attributes.status),
               publishedAt: attributes.publishedAt,
+              videoId: attributes.videoId,
             }
           };
       },

@@ -205,7 +205,6 @@ let make = _children => {
                   |> ReasonReact.arrayToElement
                 )
               </div>
-            | _ => ReasonReact.nullElement
             }
           )
         </div>;
