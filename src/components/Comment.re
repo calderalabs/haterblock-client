@@ -47,6 +47,7 @@ let make =
             | Some(videoId) =>
               <a
                 href={j|https://youtube.com/watch?v=$videoId|j}
+                className="Link"
                 target="_blank">
                 <span className="fa fa-film" />
               </a>

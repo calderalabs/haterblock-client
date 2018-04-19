@@ -8,6 +8,7 @@ module User = {
     name: string,
     email: string,
     syncedAt: option(Moment.t),
+    autoRejectEnabled: bool,
   };
   include
     JsonApi.MakeDecoder(
@@ -17,16 +18,24 @@ module User = {
           name: string,
           email: string,
           syncedAt: Js.Null.t(string),
+          autoRejectEnabled: bool,
         };
         let attributesDecoder = (json: Js.Json.t) : attributes =>
           Json.Decode.{
             name: json |> field("name", string),
             email: json |> field("email", string),
             syncedAt: json |> nullable(field("synced_at", string)),
+            autoRejectEnabled: json |> field("auto_reject_enabled", bool),
           };
         let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : t =>
           switch (resource.attributes) {
-          | None => {id: resource.id, name: "", email: "", syncedAt: None}
+          | None => {
+              id: resource.id,
+              name: "",
+              email: "",
+              syncedAt: None,
+              autoRejectEnabled: false,
+            }
           | Some(attributes) =>
             let syncedAt =
               switch (Js.Null.toOption(attributes.syncedAt)) {
@@ -38,6 +47,7 @@ module User = {
               name: attributes.name,
               email: attributes.email,
               syncedAt,
+              autoRejectEnabled: attributes.autoRejectEnabled,
             };
           };
       },
@@ -52,6 +62,30 @@ let fetch = (callback: Callback.t(User.t, Api.error)) =>
       response =>
         switch (response) {
         | Success(json) => callback(Success(json |> User.decodeOne))
+        | Error(error) => callback(Error(error))
+        },
+    (),
+  );
+
+let update = (user: User.t, callback: Callback.t(unit, Api.error)) =>
+  Api.request(
+    ~method=Fetch.Put,
+    ~path="/users/me",
+    ~body=[
+      Json.Encode.(
+        "user",
+        object_([
+          (
+            "auto_reject_enabled",
+            boolean(Js.Boolean.to_js_boolean(user.autoRejectEnabled)),
+          ),
+        ]),
+      ),
+    ],
+    ~callback=
+      response =>
+        switch (response) {
+        | Success(_json) => callback(Success())
         | Error(error) => callback(Error(error))
         },
     (),

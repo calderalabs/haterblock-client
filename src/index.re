@@ -8,6 +8,8 @@ open Belt;
 
 [%bs.raw {|require('./components/Button.css')|}];
 
+[%bs.raw {|require('./components/Link.css')|}];
+
 [@bs.module "./registerServiceWorker"]
 external registerServiceWorker : unit => unit = "default";
 

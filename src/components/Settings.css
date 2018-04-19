@@ -1,0 +1,20 @@
+.Settings {
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgba(108, 133, 159, .4);
+  margin: 20px;
+  background-color: #f4f9fd;
+  padding: 20px;
+}
+
+.Settings__checkboxLabel {
+  margin-left: 15px;
+}
+
+.Settings__checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.Settings__save {
+  margin-top: 20px;
+}

@@ -2,9 +2,14 @@ open Belt;
 
 [%bs.raw {|require('./App.css')|}];
 
+type page =
+  | Dashboard
+  | Settings;
+
 type state = {
   loadingMessage: option(string),
   currentUser: option(UserData.User.t),
+  currentPage: page,
 };
 
 type action =
@@ -12,7 +17,8 @@ type action =
   | UserLoaded(UserData.User.t)
   | Loading(string)
   | Loaded
-  | Logout;
+  | Logout
+  | ShowPage(page);
 
 let component = ReasonReact.reducerComponent("App");
 
@@ -38,11 +44,18 @@ let make = _children => {
       }
     );
   };
+  let router = (self, url) =>
+    switch (url.ReasonReact.Router.path) {
+    | [] => self.ReasonReact.send(ShowPage(Dashboard))
+    | ["settings"] => self.send(ShowPage(Settings))
+    | _ => self.send(ShowPage(Dashboard))
+    };
   {
     ...component,
     initialState: () => {
       loadingMessage: Some("Loading..."),
       currentUser: None,
+      currentPage: Dashboard,
     },
     didMount: ({ReasonReact.send}) => {
       Gapi.load(~libs="auth2:client", ~callback=() => {
@@ -54,7 +67,7 @@ let make = _children => {
         );
         fetchCurrentUser(send);
       });
-      ReasonReact.NoUpdate;
+      ReasonReact.SideEffects((self => router(self, ReasonReact.Router.dangerouslyGetInitialUrl())));
     },
     reducer: (action, state) =>
       switch (action) {
@@ -69,8 +82,18 @@ let make = _children => {
           {...state, currentUser: None},
           ((_) => Global.clearSessionToken()),
         )
+      | ShowPage(page) => ReasonReact.Update({...state, currentPage: page})
       },
-    render: ({state, send}) =>
+    subscriptions: self => [
+      Sub(
+        () => ReasonReact.Router.watchUrl(router(self)),
+        ReasonReact.Router.unwatchUrl,
+      ),
+    ],
+    render: ({state, send}) => {
+      let navClassName = page =>
+        page == state.currentPage ?
+          "App__navItem App__navItem--active" : "App__navItem";
       <div className="App">
         <div className="App__header">
           <div className="App__title">
@@ -102,6 +125,22 @@ let make = _children => {
             )
           </div>
         </div>
+        <div className="App__nav">
+          <div className="App__navInner">
+            <div className="App__navContainer">
+              <a
+                className=(navClassName(Dashboard))
+                onClick=((_) => ReasonReact.Router.push("/"))>
+                (ReasonReact.stringToElement("Dashboard"))
+              </a>
+              <a
+                className=(navClassName(Settings))
+                onClick=((_) => ReasonReact.Router.push("/settings"))>
+                (ReasonReact.stringToElement("Settings"))
+              </a>
+            </div>
+          </div>
+        </div>
         <div className="App__content">
           <div className="App__contentInner">
             <AppAlert />
@@ -111,7 +150,11 @@ let make = _children => {
                 <MessageBox>
                   (ReasonReact.stringToElement(loadingMessage))
                 </MessageBox>
-              | (Some(user), None) => <Dashboard user />
+              | (Some(user), None) =>
+                switch (state.currentPage) {
+                | Dashboard => <Dashboard user />
+                | Settings => <Settings user onUserUpdated=((user) => send(UserLoaded(user)))/>
+                }
               | (None, _) =>
                 <div className="App__landing">
                   <button
@@ -142,6 +185,7 @@ let make = _children => {
             </small>
           </div>
         </div>
-      </div>,
+      </div>;
+    },
   };
 };
