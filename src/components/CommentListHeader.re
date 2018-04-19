@@ -41,7 +41,7 @@ let make =
             onClick=onRejectMarked
             disabled=(List.length(markedForRejection) == 0)
             className="Button Button--small">
-            (ReasonReact.stringToElement("Reject Marked"))
+            (ReasonReact.stringToElement("Reject"))
           </AsyncButton>
         </div>
         <div>
