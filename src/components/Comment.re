@@ -40,6 +40,19 @@ let make =
         <div className="Comment__sentiment">
           (ReasonReact.stringToElement(sentiment))
         </div>
+        <div className="Comment__video">
+          (
+            switch (comment.videoId) {
+            | None => ReasonReact.nullElement
+            | Some(videoId) =>
+              <a
+                href={j|https://youtube.com/watch?v=$videoId|j}
+                target="_blank">
+                <span className="fa fa-film" />
+              </a>
+            }
+          )
+        </div>
         <div className="Comment__body">
           <div className="Comment__publishedAt">
             (
@@ -48,18 +61,7 @@ let make =
               )
             )
           </div>
-          (
-            switch (comment.videoId) {
-            | None => ReasonReact.nullElement
-            | Some(videoId) =>
-              <div className="Comment__video">
-                <a href={j|https://youtube.com/watch?v=$videoId|j}>
-                  (ReasonReact.stringToElement("Go to video"))
-                </a>
-              </div>
-            }
-          )
-          <div dangerouslySetInnerHTML={"__html": comment.body} />
+          <div> (ReasonReact.stringToElement(comment.body)) </div>
         </div>
         <div className="Comment__actions">
           (

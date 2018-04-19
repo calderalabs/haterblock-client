@@ -26,6 +26,10 @@
   font-size: 16px;
 }
 
+.App a {
+  color: #4FB0D3;
+}
+
 .App__headerItems {
   display: flex;
   align-items: center;

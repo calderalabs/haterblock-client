@@ -21,3 +21,8 @@
   display: flex;
   padding-right: 20px;
 }
+
+.Comment__video {
+  padding-left: 20px;
+  min-width: 16px;
+}
