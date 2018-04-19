@@ -46,7 +46,7 @@ let make =
               _event => self.ReasonReact.send(ToggleAutoRejectEnabled)
             )
           />
-          <label className="Settings__checkboxLabel" htmlFor="neutral">
+          <label className="Settings__checkboxLabel" htmlFor="autoReject">
             (ReasonReact.stringToElement("Auto Reject Hateful Comments"))
           </label>
         </div>
