@@ -8,6 +8,7 @@ let component = ReasonReact.statelessComponent("Comment");
 
 let sentimentToEmoji = (sentiment: CommentData.Sentiment.t) =>
   switch (sentiment) {
+  | Hateful => {js|😡|js}
   | Negative => {js|😠|js}
   | Neutral => {js|😐|js}
   | Positive => {js|🙂|js}

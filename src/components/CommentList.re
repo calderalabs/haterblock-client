@@ -54,9 +54,12 @@ let make = _children => {
   let isMarkedForRejection =
       (markedForRejection: list(Model.id), comment: CommentData.Comment.t) =>
     markedForRejection |> List.has(_, comment.id, (==));
-  let loadComments =
-      (~page=1, {ReasonReact.send, state}) =>
-    CommentData.fetchAll(~status=state.filters.status, ~sentiment=state.filters.sentiment, ~page, response =>
+  let loadComments = (~page=1, {ReasonReact.send, state}) =>
+    CommentData.fetchAll(
+      ~status=state.filters.status,
+      ~sentiment=state.filters.sentiment,
+      ~page,
+      response =>
       send(CommentsLoaded(response))
     );
   {
@@ -67,7 +70,7 @@ let make = _children => {
       markedForRejection: [],
       filters: {
         status: [Published],
-        sentiment: [Negative],
+        sentiment: [Hateful, Negative],
       },
     },
     reducer: (action, state) =>
@@ -119,10 +122,11 @@ let make = _children => {
             comments: [],
           })
         }
-      | SetFilters(filters) => ReasonReact.UpdateWithSideEffects(
-        {...state, comments: [], response: None, filters},
-        (self => loadComments(self)),
-      )
+      | SetFilters(filters) =>
+        ReasonReact.UpdateWithSideEffects(
+          {...state, comments: [], response: None, filters},
+          (self => loadComments(self)),
+        )
       },
     didMount: self => {
       loadComments(self);
