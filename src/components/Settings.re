@@ -34,22 +34,11 @@ let make =
       },
     render: self =>
       <div className="Settings">
-        <div className="Settings__checkbox">
-          <input
-            name="autoReject"
-            id="autoReject"
-            _type="checkbox"
-            checked=(
-              Js.Boolean.to_js_boolean(self.state.user.autoRejectEnabled)
-            )
-            onChange=(
-              _event => self.ReasonReact.send(ToggleAutoRejectEnabled)
-            )
-          />
-          <label className="Settings__checkboxLabel" htmlFor="autoReject">
-            (ReasonReact.stringToElement("Auto Reject Hateful Comments"))
-          </label>
-        </div>
+        <Checkbox
+          label="Auto Reject Hateful Comments"
+          checked=self.state.user.autoRejectEnabled
+          onChange=(() => self.ReasonReact.send(ToggleAutoRejectEnabled))
+        />
         <div className="Settings__save">
           <AsyncButton className="Button--primary" onClick=(save(self.state))>
             (ReasonReact.stringToElement("Save"))

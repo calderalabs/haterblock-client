@@ -37,108 +37,60 @@ let make = (~filters: filters, ~onFiltersChange: filters => unit, _children) => 
     render: _self =>
       <div className="CommentListFilters">
         <div className="CommentListFilters__filter">
-          <input
-            name="published"
-            id="published"
-            _type="checkbox"
-            checked=(
-              Js.Boolean.to_js_boolean(
-                isStatusChecked(CommentData.Status.Published),
-              )
-            )
-            onChange=(_event => onToggleStatus(CommentData.Status.Published))
+          <Checkbox
+            label=(CommentData.Status.toString(CommentData.Status.Published))
+            checked=(isStatusChecked(CommentData.Status.Published))
+            onChange=(() => onToggleStatus(CommentData.Status.Published))
+            className="Checkbox--small"
           />
-          <label className="CommentListFilters__label" htmlFor="published">
-            (ReasonReact.stringToElement("Published"))
-          </label>
         </div>
         <div className="CommentListFilters__filter">
-          <input
-            name="rejected"
-            id="rejected"
-            _type="checkbox"
-            checked=(
-              Js.Boolean.to_js_boolean(
-                isStatusChecked(CommentData.Status.Rejected),
-              )
-            )
-            onChange=(_event => onToggleStatus(CommentData.Status.Rejected))
+          <Checkbox
+            label=(CommentData.Status.toString(CommentData.Status.Rejected))
+            checked=(isStatusChecked(CommentData.Status.Rejected))
+            onChange=(() => onToggleStatus(CommentData.Status.Rejected))
+            className="Checkbox--small"
           />
-          <label className="CommentListFilters__label" htmlFor="rejected">
-            (ReasonReact.stringToElement("Rejected"))
-          </label>
         </div>
         <div className="CommentListFilters__filter">
-          <input
-            name="hateful"
-            id="hateful"
-            _type="checkbox"
-            checked=(
-              Js.Boolean.to_js_boolean(
-                isSentimentChecked(CommentData.Sentiment.Hateful),
-              )
+          <Checkbox
+            label=(
+              CommentData.Sentiment.toString(CommentData.Sentiment.Hateful)
             )
-            onChange=(
-              _event => onToggleSentiment(CommentData.Sentiment.Hateful)
-            )
+            checked=(isSentimentChecked(CommentData.Sentiment.Hateful))
+            onChange=(() => onToggleSentiment(CommentData.Sentiment.Hateful))
+            className="Checkbox--small"
           />
-          <label className="CommentListFilters__label" htmlFor="hateful">
-            (ReasonReact.stringToElement("Hateful"))
-          </label>
         </div>
         <div className="CommentListFilters__filter">
-          <input
-            name="negative"
-            id="negative"
-            _type="checkbox"
-            checked=(
-              Js.Boolean.to_js_boolean(
-                isSentimentChecked(CommentData.Sentiment.Negative),
-              )
+          <Checkbox
+            label=(
+              CommentData.Sentiment.toString(CommentData.Sentiment.Negative)
             )
-            onChange=(
-              _event => onToggleSentiment(CommentData.Sentiment.Negative)
-            )
+            checked=(isSentimentChecked(CommentData.Sentiment.Negative))
+            onChange=(() => onToggleSentiment(CommentData.Sentiment.Negative))
+            className="Checkbox--small"
           />
-          <label className="CommentListFilters__label" htmlFor="negative">
-            (ReasonReact.stringToElement("Negative"))
-          </label>
         </div>
         <div className="CommentListFilters__filter">
-          <input
-            name="neutral"
-            id="neutral"
-            _type="checkbox"
-            checked=(
-              Js.Boolean.to_js_boolean(
-                isSentimentChecked(CommentData.Sentiment.Neutral),
-              )
+          <Checkbox
+            label=(
+              CommentData.Sentiment.toString(CommentData.Sentiment.Neutral)
             )
-            onChange=(
-              _event => onToggleSentiment(CommentData.Sentiment.Neutral)
-            )
+            checked=(isSentimentChecked(CommentData.Sentiment.Neutral))
+            onChange=(() => onToggleSentiment(CommentData.Sentiment.Neutral))
+            className="Checkbox--small"
           />
-          <label className="CommentListFilters__label" htmlFor="neutral">
-            (ReasonReact.stringToElement("Neutral"))
-          </label>
         </div>
         <div className="CommentListFilters__filter">
-          <input
-            name="positive"
-            id="positive"
-            _type="checkbox"
-            checked=(
-              Js.Boolean.to_js_boolean(
-                isSentimentChecked(CommentData.Sentiment.Positive),
-              )
+          <Checkbox
+            label=(
+              CommentData.Sentiment.toString(CommentData.Sentiment.Positive)
             )
-            onChange=(
-              _event => onToggleSentiment(CommentData.Sentiment.Positive)
-            )
+            checked=(isSentimentChecked(CommentData.Sentiment.Positive))
+            onChange=(() => onToggleSentiment(CommentData.Sentiment.Positive))
+            className="Checkbox--small"
           />
-          <label className="CommentListFilters__label" htmlFor="positive">
-            (ReasonReact.stringToElement("Positive"))
-          </label>
         </div>
       </div>,
   };

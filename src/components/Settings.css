@@ -6,15 +6,6 @@
   padding: 20px;
 }
 
-.Settings__checkboxLabel {
-  margin-left: 15px;
-}
-
-.Settings__checkbox {
-  display: flex;
-  align-items: center;
-}
-
 .Settings__save {
   margin-top: 20px;
 }

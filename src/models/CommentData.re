@@ -24,6 +24,13 @@ module Status = {
     | "likelySpam" => LikelySpam
     | _ => raise(InvalidStatus)
     };
+  let toString = (status: t) =>
+    switch (status) {
+    | Published => "Published"
+    | HeldForReview => "Held for Review"
+    | Rejected => "Rejected"
+    | LikelySpam => "Likely Spam"
+    };
 };
 
 module Sentiment = {

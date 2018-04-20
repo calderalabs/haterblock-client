@@ -1,0 +1,12 @@
+.Checkbox__label {
+  margin-left: 10px;
+}
+
+.Checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.Checkbox--small {
+  font-size: 14px;
+}

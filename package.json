@@ -14,7 +14,8 @@
     "react-dom": "^16.2.0",
     "react-ladda": "^6.0.0",
     "react-paginate": "^5.2.2",
-    "reason-scripts": "0.8.0"
+    "reason-scripts": "0.8.0",
+    "shortid": "^2.2.8"
   },
   "scripts": {
     "start": "react-scripts start",
