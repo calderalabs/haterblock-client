@@ -136,13 +136,14 @@ let make = _children => {
       switch (self.state.response) {
       | Some(Error ()) => ReasonReact.nullElement
       | _ =>
-        let (totalEntries, totalPages) =
+        let (totalEntries, totalPages, counts) =
           switch (self.state.response) {
           | Some(Success(document)) => (
               document.meta.totalEntries,
               document.meta.totalPages,
+              document.meta.counts,
             )
-          | _ => (0, 0)
+          | _ => (0, 0, Js.Dict.empty())
           };
         <div className="CommentList">
           <CommentListHeader
@@ -157,6 +158,7 @@ let make = _children => {
           <CommentListFilters
             filters=self.state.filters
             onFiltersChange=(filters => self.send(SetFilters(filters)))
+            counts
           />
           (
             switch (self.state.comments, self.state.response) {

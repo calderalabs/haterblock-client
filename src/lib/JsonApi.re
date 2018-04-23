@@ -17,6 +17,7 @@ module Document = {
   type meta = {
     totalPages: int,
     totalEntries: int,
+    counts: Js.Dict.t(int),
   };
   type one('a) = {data: Resource.t('a)};
   type many('a) = {
@@ -30,6 +31,7 @@ module Document = {
   let metaDecoder = (json: Js.Json.t) : meta => {
     totalPages: json |> field("total_pages", int),
     totalEntries: json |> field("total_entries", int),
+    counts: json |> field("counts", dict(int)),
   };
   let decodeOne =
       (resourceDecoder: Js.Json.t => Resource.t('a), json: Js.Json.t)
