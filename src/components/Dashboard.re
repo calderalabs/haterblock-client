@@ -14,7 +14,8 @@ type action =
 
 let component = ReasonReact.reducerComponent("Dashboard");
 
-let make = (~user: UserData.User.t, _children) => {
+let make =
+    (~user: UserData.User.t, ~onUserChannelJoined: unit => unit, _children) => {
   ...component,
   initialState: () => {syncedAt: user.syncedAt, newCommentCount: 0},
   reducer: (action, state) =>
@@ -36,14 +37,18 @@ let make = (~user: UserData.User.t, _children) => {
             UserChannel.join(
               ~user,
               ~token,
-              ~callback=payload => {
-                let syncedAt =
-                  switch (Js.Null.toOption(payload##synced_at)) {
-                  | None => None
-                  | Some(syncedAt) => Some(moment(syncedAt))
-                  };
-                send(FinishedSyncing(syncedAt, payload##new_comment_count));
-              },
+              ~joinCallback=(_) => onUserChannelJoined(),
+              ~callback=
+                payload => {
+                  let syncedAt =
+                    switch (Js.Null.toOption(payload##synced_at)) {
+                    | None => None
+                    | Some(syncedAt) => Some(moment(syncedAt))
+                    };
+                  send(
+                    FinishedSyncing(syncedAt, payload##new_comment_count),
+                  );
+                },
             )
             |> ignore
         ),

@@ -67,7 +67,9 @@ let make = _children => {
         );
         fetchCurrentUser(send);
       });
-      ReasonReact.SideEffects((self => router(self, ReasonReact.Router.dangerouslyGetInitialUrl())));
+      ReasonReact.SideEffects(
+        self => router(self, ReasonReact.Router.dangerouslyGetInitialUrl()),
+      );
     },
     reducer: (action, state) =>
       switch (action) {
@@ -152,8 +154,16 @@ let make = _children => {
                 </MessageBox>
               | (Some(user), None) =>
                 switch (state.currentPage) {
-                | Dashboard => <Dashboard user />
-                | Settings => <Settings user onUserUpdated=((user) => send(UserLoaded(user)))/>
+                | Dashboard =>
+                  <Dashboard
+                    user
+                    onUserChannelJoined=(() => fetchCurrentUser(send))
+                  />
+                | Settings =>
+                  <Settings
+                    user
+                    onUserUpdated=(user => send(UserLoaded(user)))
+                  />
                 }
               | (None, _) =>
                 <div className="App__landing">

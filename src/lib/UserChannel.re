@@ -25,7 +25,12 @@ type socket = {
 external socket : (string, socketParams) => socket = "Socket";
 
 let join =
-    (~user: UserData.User.t, ~token: string, ~callback: payload => unit) => {
+    (
+      ~user: UserData.User.t,
+      ~token: string,
+      ~callback: payload => unit,
+      ~joinCallback: response => unit,
+    ) => {
   let userId = user.id;
   let baseHost = Api.baseHost;
   let protocol =
@@ -46,5 +51,5 @@ let join =
   socket##connect();
   let channel = socket##channel({j|user:$userId|j});
   channel##on("syncing_updated", callback);
-  channel##join();
+  channel##join()##receive("ok", joinCallback);
 };
