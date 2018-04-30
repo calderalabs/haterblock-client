@@ -46,7 +46,7 @@ let make = _children => {
   };
   let router = (self, url) =>
     switch (url.ReasonReact.Router.path) {
-    | [] => self.ReasonReact.send(ShowPage(Dashboard))
+    | ["dashboard"] => self.ReasonReact.send(ShowPage(Dashboard))
     | ["settings"] => self.send(ShowPage(Settings))
     | _ => self.send(ShowPage(Dashboard))
     };
@@ -78,11 +78,19 @@ let make = _children => {
       | Loaded => ReasonReact.Update({...state, loadingMessage: None})
       | Login => ReasonReact.SideEffects((self => login(self)))
       | UserLoaded(user) =>
-        ReasonReact.Update({...state, currentUser: Some(user)})
+        ReasonReact.UpdateWithSideEffects(
+          {...state, currentUser: Some(user)},
+          ((_) => ReasonReact.Router.push("/dashboard")),
+        )
       | Logout =>
         ReasonReact.UpdateWithSideEffects(
           {...state, currentUser: None},
-          ((_) => Global.clearSessionToken()),
+          (
+            (_) => {
+              ReasonReact.Router.push("/");
+              Global.clearSessionToken();
+            }
+          ),
         )
       | ShowPage(page) => ReasonReact.Update({...state, currentPage: page})
       },
@@ -127,22 +135,28 @@ let make = _children => {
             )
           </div>
         </div>
-        <div className="App__nav">
-          <div className="App__navInner">
-            <div className="App__navContainer">
-              <a
-                className=(navClassName(Dashboard))
-                onClick=((_) => ReasonReact.Router.push("/"))>
-                (ReasonReact.stringToElement("Dashboard"))
-              </a>
-              <a
-                className=(navClassName(Settings))
-                onClick=((_) => ReasonReact.Router.push("/settings"))>
-                (ReasonReact.stringToElement("Settings"))
-              </a>
+        (
+          switch (state.currentUser) {
+          | None => ReasonReact.nullElement
+          | Some(_) =>
+            <div className="App__nav">
+              <div className="App__navInner">
+                <div className="App__navContainer">
+                  <a
+                    className=(navClassName(Dashboard))
+                    onClick=((_) => ReasonReact.Router.push("/dashboard"))>
+                    (ReasonReact.stringToElement("Dashboard"))
+                  </a>
+                  <a
+                    className=(navClassName(Settings))
+                    onClick=((_) => ReasonReact.Router.push("/settings"))>
+                    (ReasonReact.stringToElement("Settings"))
+                  </a>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          }
+        )
         <div className="App__content">
           <div className="App__contentInner">
             <AppAlert />
@@ -165,18 +179,7 @@ let make = _children => {
                     onUserUpdated=(user => send(UserLoaded(user)))
                   />
                 }
-              | (None, _) =>
-                <div className="App__landing">
-                  <button
-                    onClick=(_event => send(Login))
-                    className="Button Button--primary">
-                    (
-                      ReasonReact.stringToElement(
-                        "Connect With Youtube To Get Started",
-                      )
-                    )
-                  </button>
-                </div>
+              | (None, _) => <Landing onLogin=(() => send(Login)) />
               }
             )
           </div>

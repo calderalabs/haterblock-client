@@ -57,13 +57,6 @@
   margin: 0 auto;
 }
 
-.App__landing {
-  display: flex;
-  height: 500px;
-  justify-content: center;
-  align-items: center;
-}
-
 .App__nav {
   background: #fff;
   box-shadow: 0 1px 3px 0 rgba(108, 133, 159, .3);
