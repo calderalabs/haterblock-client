@@ -1,6 +1,21 @@
 .Landing {
-  display: flex;
-  height: 500px;
-  justify-content: center;
-  align-items: center;
+  padding: 200px 20px;
+}
+
+.Landing__callToAction {
+  margin-top: 100px;
+}
+
+@media (max-width: 600px)  {
+  .Landing {
+    padding: 20px;
+  }
+
+  .Landing__callToAction {
+    margin-top: 60px;
+  }
+}
+
+.Landing__title {
+  font-size: 3em;
 }
