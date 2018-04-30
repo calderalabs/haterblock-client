@@ -64,8 +64,8 @@
 
 .Button--primary {
   color: white;
-  border-color: #088ef0;
-  background: linear-gradient(#34a5f8, #088ef0);
+  border-color: #661BCC;
+  background: linear-gradient(#8021FF, #661BCC);
 }
 
 .Button--primary:visited {
@@ -73,15 +73,15 @@
 }
 
 .Button--primary:hover, .Button--primary:focus {
-  border-color: #4cb0f9;
+  border-color: #AD66FF;
   color: white;
-  background: linear-gradient(to bottom, #42abf8, #0888e6);
+  background: linear-gradient(to bottom, #AD66FF, #661BCC);
 }
 
 .Button--primary:active, .Button--primary.Button--active {
-  color: #0880d7;
-  border-color: #0880d7;
-  background: #2798eb;
+  color: #661BCC;
+  border-color: #661BCC;
+  background: #8021FF;
 }
 
 .Button--small {
