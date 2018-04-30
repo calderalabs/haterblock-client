@@ -184,20 +184,6 @@ let make = _children => {
             )
           </div>
         </div>
-        <div className="App__footer">
-          <a href="http://calderalabs.io" className="App__calderaLabsLogo">
-            <img src=Assets.calderaLabsLogo />
-          </a>
-          <div>
-            <small>
-              (
-                ReasonReact.stringToElement(
-                  {j|Copyright © 2018 Caldera Labs Ltd.|j},
-                )
-              )
-            </small>
-          </div>
-        </div>
       </div>;
     },
   };
