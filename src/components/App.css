@@ -35,11 +35,6 @@
   padding-right: 15px;
 }
 
-.App__footer {
-  text-align: center;
-  margin: 80px 0;
-}
-
 .App__calderaLabsLogo {
   display: inline-block;
   filter: grayscale(100%);
