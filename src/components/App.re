@@ -14,7 +14,7 @@ type state = {
 
 type action =
   | Login
-  | UserLoaded(UserData.User.t)
+  | UserLoaded(UserData.User.t, unit => unit)
   | Loading(string)
   | Loaded
   | Logout
@@ -23,13 +23,13 @@ type action =
 let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
-  let fetchCurrentUser = send =>
+  let fetchCurrentUser = (~callback=(() => ()), send) =>
     switch (Session.getToken()) {
     | None => send(Loaded)
     | Some(_) =>
       UserData.fetch(response => {
         switch (response) {
-        | Success(user) => send(UserLoaded(user))
+        | Success(user) => send(UserLoaded(user, callback))
         | Error(_) => ()
         };
         send(Loaded);
@@ -39,7 +39,7 @@ let make = _children => {
     send(Loading("Logging in..."));
     Session.login(response =>
       switch (response) {
-      | Success () => fetchCurrentUser(send)
+      | Success () => fetchCurrentUser(~callback=() => ReasonReact.Router.push("/dashboard"), send)
       | Error(_error) => send(Loaded)
       }
     );
@@ -65,7 +65,7 @@ let make = _children => {
           ~scope=
             "profile email https://www.googleapis.com/auth/youtube.force-ssl",
         );
-        fetchCurrentUser(send);
+        fetchCurrentUser(~callback=() => ReasonReact.Router.push("/dashboard"), send);
       });
       ReasonReact.SideEffects(
         self => router(self, ReasonReact.Router.dangerouslyGetInitialUrl()),
@@ -77,11 +77,8 @@ let make = _children => {
         ReasonReact.Update({...state, loadingMessage: Some(message)})
       | Loaded => ReasonReact.Update({...state, loadingMessage: None})
       | Login => ReasonReact.SideEffects((self => login(self)))
-      | UserLoaded(user) =>
-        ReasonReact.UpdateWithSideEffects(
-          {...state, currentUser: Some(user)},
-          ((_) => ReasonReact.Router.push("/dashboard")),
-        )
+      | UserLoaded(user, callback) =>
+        ReasonReact.UpdateWithSideEffects({...state, currentUser: Some(user)}, (_) => callback())
       | Logout =>
         ReasonReact.UpdateWithSideEffects(
           {...state, currentUser: None},
@@ -176,7 +173,7 @@ let make = _children => {
                 | Settings =>
                   <Settings
                     user
-                    onUserUpdated=(user => send(UserLoaded(user)))
+                    onUserUpdated=(user => send(UserLoaded(user, () => ())))
                   />
                 }
               | (None, _) => <Landing onLogin=(() => send(Login)) />
