@@ -85,6 +85,10 @@ let update = (user: User.t, callback: Callback.t(unit, Api.error)) =>
             "auto_reject_enabled",
             boolean(Js.Boolean.to_js_boolean(user.autoRejectEnabled)),
           ),
+          (
+            "email_notifications_enabled",
+            boolean(Js.Boolean.to_js_boolean(user.emailNotificationsEnabled)),
+          )
         ]),
       ),
     ],
