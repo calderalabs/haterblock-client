@@ -16,31 +16,37 @@ type action =
   | Login
   | UserLoaded(UserData.User.t, unit => unit)
   | Loading(string)
-  | Loaded
+  | Loaded(option(UserData.User.t))
   | Logout
   | ShowPage(page);
 
 let component = ReasonReact.reducerComponent("App");
 
 let make = _children => {
-  let fetchCurrentUser = (~callback=(() => ()), send) =>
+  let fetchCurrentUser = (~callback=() => (), send) =>
     switch (Session.getToken()) {
-    | None => send(Loaded)
+    | None => send(Loaded(None))
     | Some(_) =>
       UserData.fetch(response => {
         switch (response) {
-        | Success(user) => send(UserLoaded(user, callback))
-        | Error(_) => ()
+        | Success(user) => {
+          send(UserLoaded(user, callback));
+          send(Loaded(Some(user)));
+        }
+        | Error(_) => send(Loaded(None))
         };
-        send(Loaded);
       })
     };
   let login = ({ReasonReact.send}) => {
     send(Loading("Logging in..."));
     Session.login(response =>
       switch (response) {
-      | Success () => fetchCurrentUser(~callback=() => ReasonReact.Router.push("/dashboard"), send)
-      | Error(_error) => send(Loaded)
+      | Success () =>
+        fetchCurrentUser(
+          ~callback=() => ReasonReact.Router.push("/dashboard"),
+          send,
+        )
+      | Error(_error) => send(Loaded(None))
       }
     );
   };
@@ -58,6 +64,7 @@ let make = _children => {
       currentPage: Dashboard,
     },
     didMount: ({ReasonReact.send}) => {
+      let initialUrl = ReasonReact.Router.dangerouslyGetInitialUrl();
       Gapi.load(~libs="auth2:client", ~callback=() => {
         Gapi.init(
           ~clientId=
@@ -65,20 +72,32 @@ let make = _children => {
           ~scope=
             "profile email https://www.googleapis.com/auth/youtube.force-ssl",
         );
-        fetchCurrentUser(~callback=() => ReasonReact.Router.push("/dashboard"), send);
+        fetchCurrentUser(
+          ~callback=
+            () =>
+              switch (initialUrl.path) {
+              | [] => ReasonReact.Router.push("/dashboard")
+              | _ => ()
+              },
+          send,
+        );
       });
-      ReasonReact.SideEffects(
-        self => router(self, ReasonReact.Router.dangerouslyGetInitialUrl()),
-      );
+      ReasonReact.SideEffects(self => router(self, initialUrl));
     },
     reducer: (action, state) =>
       switch (action) {
       | Loading(message) =>
         ReasonReact.Update({...state, loadingMessage: Some(message)})
-      | Loaded => ReasonReact.Update({...state, loadingMessage: None})
+      | Loaded(user) => switch user {
+        | None => ReasonReact.UpdateWithSideEffects({...state, loadingMessage: None}, (_) => ReasonReact.Router.push("/"))
+        | Some(user) =>  ReasonReact.Update({...state, loadingMessage: None})
+      }
       | Login => ReasonReact.SideEffects((self => login(self)))
       | UserLoaded(user, callback) =>
-        ReasonReact.UpdateWithSideEffects({...state, currentUser: Some(user)}, (_) => callback())
+        ReasonReact.UpdateWithSideEffects(
+          {...state, currentUser: Some(user)},
+          ((_) => callback()),
+        )
       | Logout =>
         ReasonReact.UpdateWithSideEffects(
           {...state, currentUser: None},

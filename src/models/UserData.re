@@ -9,6 +9,7 @@ module User = {
     email: string,
     syncedAt: option(Moment.t),
     autoRejectEnabled: bool,
+    emailNotificationsEnabled: bool,
   };
   include
     JsonApi.MakeDecoder(
@@ -19,6 +20,7 @@ module User = {
           email: string,
           syncedAt: Js.Null.t(string),
           autoRejectEnabled: bool,
+          emailNotificationsEnabled: bool,
         };
         let attributesDecoder = (json: Js.Json.t) : attributes =>
           Json.Decode.{
@@ -26,6 +28,8 @@ module User = {
             email: json |> field("email", string),
             syncedAt: json |> nullable(field("synced_at", string)),
             autoRejectEnabled: json |> field("auto_reject_enabled", bool),
+            emailNotificationsEnabled:
+              json |> field("email_notifications_enabled", bool),
           };
         let resourceToRecord = (resource: JsonApi.Resource.t(attributes)) : t =>
           switch (resource.attributes) {
@@ -35,6 +39,7 @@ module User = {
               email: "",
               syncedAt: None,
               autoRejectEnabled: false,
+              emailNotificationsEnabled: true,
             }
           | Some(attributes) =>
             let syncedAt =
@@ -48,6 +53,7 @@ module User = {
               email: attributes.email,
               syncedAt,
               autoRejectEnabled: attributes.autoRejectEnabled,
+              emailNotificationsEnabled: attributes.emailNotificationsEnabled,
             };
           };
       },
