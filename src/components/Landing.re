@@ -24,6 +24,10 @@ let make = (~onLogin: unit => unit, _children) => {
             onClick=(_event => onLogin()) className="Button Button--primary">
             (ReasonReact.stringToElement("Connect With Youtube"))
           </button>
+
+          <div className="Landing__info">
+            (ReasonReact.stringToElement("We'll use your account connection only to manage your comments."))
+          </div>
         </div>
       </div>
       <div className="Landing__features">

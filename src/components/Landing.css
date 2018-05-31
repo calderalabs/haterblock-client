@@ -20,6 +20,11 @@
   margin: 0;
 }
 
+.Landing__info {
+  margin-top: 15px;
+  font-size: 15px;
+}
+
 .Landing__features {
   margin-top: 100px;
   display: flex;

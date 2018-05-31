@@ -123,7 +123,7 @@ let make = _children => {
       <div className="App">
         <div className="App__header">
           <div className="App__title">
-            (ReasonReact.stringToElement("Haterblock"))
+            (ReasonReact.stringToElement("HaterBlock"))
           </div>
           <div className="App__headerItems">
             (
