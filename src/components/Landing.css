@@ -1,16 +1,15 @@
 .Landing {
-  padding: 200px 20px;
+  padding: 200px 80px;
 }
 
 .Landing__callToAction {
-  margin-top: 100px;
+  margin-top: 60px;
 }
 
-@media (max-width: 600px)  {
+@media (max-width: 600px) {
   .Landing {
     padding: 20px;
   }
-
   .Landing__callToAction {
     margin-top: 60px;
   }
@@ -18,4 +17,36 @@
 
 .Landing__title {
   font-size: 3em;
+  margin: 0;
+}
+
+.Landing__features {
+  margin-top: 100px;
+  display: flex;
+  justify-content: space-between;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 4px 9px 0 rgba(23, 28, 33, .06);
+  padding: 30px;
+}
+
+.Landing__feature {
+  margin-right: 20px;
+  flex-grow: 1;
+  flex-basis: 0;
+}
+
+.Landing__featureTitle {
+  font-size: 2em;
+  margin-bottom: 15px;
+}
+
+.Landing__feature:last-child {
+  margin-right: 0;
+}
+
+@media (max-width: 600px) {
+  .Landing__features {
+    flex-direction: column;
+  }
 }
